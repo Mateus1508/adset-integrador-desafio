@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using AdSetSolution.Domain.Enums;
 
 namespace AdSetSolution.Domain.Models
 {
@@ -24,9 +25,8 @@ namespace AdSetSolution.Domain.Models
         public int Available => Total - Used;
 
         [Required]
-        public int PortalId { get; set; }
+        public PortalType PortalType { get; set; }
 
-        [ForeignKey(nameof(PortalId))]
-        public Portal Portal { get; set; }
+        public ICollection<VehiclePackage> VehiclePackages { get; set; }
     }
 }
