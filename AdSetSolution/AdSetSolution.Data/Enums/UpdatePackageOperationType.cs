@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace AdSetSolution.Domain.Enums
 {
-    public enum PortalType
+    public enum UpdatePackageOperationType
     {
-        ICarros = 1,
-        WebMotors = 2
+        Increment = 1,
+        Decrement = 2
     }
 }

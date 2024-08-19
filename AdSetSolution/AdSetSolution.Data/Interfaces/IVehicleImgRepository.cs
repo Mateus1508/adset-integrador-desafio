@@ -2,9 +2,9 @@
 
 namespace AdSetSolution.Domain.Interfaces
 {
-    public interface VehicleImgRepository
+    public interface IVehicleImgRepository
     {
-        Task<string> AddImage(VehicleImg vehicleImg);
+        Task<bool> AddImage(VehicleImg vehicleImg);
         Task<bool> DeleteImage(int id);
     }
 }

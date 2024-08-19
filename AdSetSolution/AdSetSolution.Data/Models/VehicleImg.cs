@@ -11,12 +11,13 @@ namespace AdSetSolution.Domain.Models
         [ForeignKey(nameof(Vehicle))]
         public int VehicleId { get; set; }
 
+        [Required]
         public byte[] ImageData { get; set; }
 
         [MaxLength(255)]
         public string? FileName { get; set; }
 
-        [MaxLength(50)]
+        [MaxLength(20)]
         public string? ContentType { get; set; }
 
         public virtual Vehicle Vehicle { get; set; }

@@ -5,7 +5,7 @@
 namespace AdSetSolution.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class CreateAndSeedPackageTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,6 +25,17 @@ namespace AdSetSolution.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Packages", x => x.Id);
                 });
+
+            migrationBuilder.InsertData(
+               table: "Packages",
+               columns: new[] { "Id", "Name", "Total", "Used", "PortalType" },
+               values: new object[,]
+               {
+                    { 1, "Diamante Feirão", 18, 10, 1 },
+                    { 2, "Diamante", 55, 30, 1 },
+                    { 3, "Platinum", 50, 40, 1 },
+                    { 4, "Básico", 55, 30, 2 }
+               });
 
             migrationBuilder.CreateTable(
                 name: "Vehicles",
@@ -55,7 +66,7 @@ namespace AdSetSolution.Infrastructure.Migrations
                     VehicleId = table.Column<int>(type: "int", nullable: false),
                     ImageData = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     FileName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    ContentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    ContentType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true)
                 },
                 constraints: table =>
                 {

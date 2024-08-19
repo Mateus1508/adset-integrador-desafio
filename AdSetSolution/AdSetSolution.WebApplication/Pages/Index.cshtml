@@ -4,7 +4,32 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h2>Veículos</h2>
+@if (Model.Vehicles.Any())
+{
+    <ul>
+        @foreach (var vehicle in Model.Vehicles)
+        {
+            <li>@vehicle.Modelo</li>
+        }
+    </ul>
+}
+else
+{
+    <p>Nenhum veículo encontrado.</p>
+}
+
+<h2>Pacotes</h2>
+@if (Model.Packages.Any())
+{
+    <ul>
+        @foreach (var package in Model.Packages)
+        {
+            <li>@package.Name</li>
+        }
+    </ul>
+}
+else
+{
+    <p>Nenhum pacote encontrado.</p>
+}
