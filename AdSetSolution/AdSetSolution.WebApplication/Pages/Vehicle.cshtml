@@ -1,0 +1,126 @@
+﻿@page
+@model AdSetSolution.WebApplication.Pages.VehicleModel
+@{
+    ViewData["Title"] = Model.IsEditing ? "Editar Veículo" : "Adicionar Veículo";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-info">
+        @Model.Message
+    </div>
+}
+
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Vehicle.Id" class="form-control" />
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Vehicle.Marca"></label>
+                    <input asp-for="Vehicle.Marca" class="form-control" />
+                    <span asp-validation-for="Vehicle.Marca" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Vehicle.Modelo"></label>
+                    <input asp-for="Vehicle.Modelo" class="form-control" />
+                    <span asp-validation-for="Vehicle.Modelo" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Vehicle.Ano"></label>
+                    <input asp-for="Vehicle.Ano" class="form-control" />
+                    <span asp-validation-for="Vehicle.Ano" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Vehicle.Placa"></label>
+                    <input asp-for="Vehicle.Placa" class="form-control" />
+                    <span asp-validation-for="Vehicle.Placa" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Vehicle.Km"></label>
+                    <input asp-for="Vehicle.Km" class="form-control" />
+                    <span asp-validation-for="Vehicle.Km" class="text-danger"></span>
+                </div>
+            <div class="form-group mt-2">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Vehicle.Cor"></label>
+                    <input asp-for="Vehicle.Cor" class="form-control" />
+                    <span asp-validation-for="Vehicle.Cor" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Vehicle.Preco"></label>
+                    <input asp-for="Vehicle.Preco" class="form-control" />
+                    <span asp-validation-for="Vehicle.Preco" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Vehicle.Opcionais"></label>
+                    <textarea asp-for="Vehicle.Opcionais" class="form-control"></textarea>
+                    <span asp-validation-for="Vehicle.Opcionais" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label for="VehicleImgs">Imagens</label>
+                    <input type="file" id="VehicleImgs" name="VehicleImgs" multiple class="form-control" accept="image/*" onchange="previewImages()" />
+                    <span asp-validation-for="VehicleImgs" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>Imagens a serem adicionadas</label>
+                    <div id="newImagesContainer">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Imagens do veículo</label>
+                    <div id="existingImagesContainer">
+                        @foreach (var img in Model.ExistingImages)
+                        {
+                            <div class="existing-image">
+                                <img src="@img.ImageBase64" alt="@img.FileName" style="width: 100px; height: 100px;" />
+                                <form method="post" asp-page-handler="RemoveImage">
+                                    <input type="hidden" name="imageId" value="@img.Id" />
+                                    <input type="hidden" name="vehicleId" value="@Model.Vehicle.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function previewImages() {
+            const previewContainer = document.getElementById('newImagesContainer');
+            const files = document.getElementById('VehicleImgs').files;
+
+            previewContainer.innerHTML = '';
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = event.target.result;
+                        imgElement.className = "new-image"
+                        imgElement.style.width = '100px';
+                        imgElement.style.margin = '5px';
+                        previewContainer.appendChild(imgElement);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+    </script>
+}

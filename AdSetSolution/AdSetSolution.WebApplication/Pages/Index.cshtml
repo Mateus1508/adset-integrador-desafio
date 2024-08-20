@@ -1,35 +1,211 @@
 ﻿@page
+@using AdSetSolution.Domain.Enums
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
 
-<h2>Veículos</h2>
-@if (Model.Vehicles.Any())
-{
-    <ul>
-        @foreach (var vehicle in Model.Vehicles)
-        {
-            <li>@vehicle.Modelo</li>
-        }
-    </ul>
-}
-else
-{
-    <p>Nenhum veículo encontrado.</p>
-}
+<div class="main-container">
+    <section class="info-box">
+        <div class="info-item">
+            <h2>@Model.TotalVehicles Veículos</h2>
+            <h3 style="color:#00b4d8">Total</h3>
+        </div>
+        <div class="info-item border-curve">
+            <h2>@Model.VehiclesWithPhotos Veículos</h2>
+            <h3 style="color:#76c893">Com fotos</h3>
+        </div>
+        <div class="info-item">
+            <h2>@Model.VehiclesWithoutPhotos Veículos</h2>
+            <h3 style="color:#ec5766">Sem fotos</h3>
+        </div>
+        <div class="info-item pipe">
+            <h2>
+                Exportar estoque
+            </h2>
+        </div>
+        <div class="buttons">
+            <button class="btn btn-primary">Adicionar veículo</button>
+            <button class="btn btn-warning">Salvar</button>
+        </div>
+    </section>
+    <section>
+        <form method="post" class="search-params" onsubmit="return validateYears()">
+            <div class="input-box">
+                <div class="filter-input-box">
+                    <label asp-for="Filter.Placa"></label>
+                    <input asp-for="Filter.Placa" class="filter-input" style="width: 150px;" />
+                </div>
+                <div class="filter-input-box">
+                    <label asp-for="Filter.Marca"></label>
+                    <input asp-for="Filter.Marca" class="filter-input" style="width: 150px;" />
+                </div>
+                <div class="filter-input-box">
+                    <label asp-for="Filter.Modelo"></label>
+                    <input asp-for="Filter.Modelo" class="filter-input" style="width: 200px;" />
+                </div>
+                <div class="filter-input-box">
+                    <label for="AnoMin">Ano Min</label>
+                    <select asp-for="Filter.AnoMin" id="AnoMin" class="filter-select">
+                        <option value="">Todos</option>
+                        @for (int i = 2000; i <= 2024; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </div>
+                <div class="filter-input-box">
+                    <label for="AnoMax">Ano Max</label>
+                    <select asp-for="Filter.AnoMax" id="AnoMax" class="filter-select">
+                        <option value="">Todos</option>
+                        @for (int i = 2000; i <= 2024; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </div>
+                <div class="filter-input-box">
+                    <label for="Fotos">Fotos</label>
+                    <select asp-for="Filter.Fotos" id="Fotos" class="filter-select">
+                        <option value="">Todos</option>
+                        <option value="ComFotos">Com fotos</option>
+                        <option value="SemFotos">Sem fotos</option>
+                    </select>
+                </div>
+                <div class="filter-input-box">
+                    <label for="Cor">Cor</label>
+                    <select asp-for="Filter.Cor" id="Cor" class="filter-select">
+                        <option value="">Todos</option>
+                        <option value="Branco">Branco</option>
+                        <option value="Cinza">Cinza</option>
+                        <option value="Preto">Preto</option>
+                        <option value="Vermelho">Vermelho</option>
+                    </select>
+                </div>
+                <div class="filter-input-box">
+                    <label for="Preco">Preço</label>
+                    <select asp-for="Filter.Preco" id="Preco" class="filter-select">
+                        <option value="">Todos</option>
+                        <option value="10000-50000">10mil a 50mil</option>
+                        <option value="50000-90000">50mil a 90mil</option>
+                        <option value="90000+">+90mil</option>
+                    </select>
+                </div>
+                <div class="filter-input-box">
+                    <label asp-for="Filter.Opcionais"></label>
+                    <input asp-for="Filter.Opcionais" class="filter-input" />
+                </div>
+            </div>
 
-<h2>Pacotes</h2>
-@if (Model.Packages.Any())
-{
-    <ul>
-        @foreach (var package in Model.Packages)
-        {
-            <li>@package.Name</li>
+            <div class="filter-input-box">
+                <button type="submit" class="search-button" style="background: #55a630;" asp-page-handler="Filter">Buscar</button>
+            </div>
+        </form>
+    </section>
+    <section class="registers">
+        <div class="vehicles">
+            @if (Model.Vehicles != null && Model.Vehicles.Any())
+            {
+                @foreach (var vehicle in Model.Vehicles)
+                {
+                    <div class="vehicle-item">
+                        <button type="button" class="btn btn-danger">Excluir</button>
+                        <div class="vehicle-image">
+                            @if (vehicle.VehicleImgs != null && vehicle.VehicleImgs.Any())
+                            {
+                                var firstImage = vehicle.VehicleImgs.First();
+                                <img src="@firstImage.ImageBase64" alt="@vehicle.Modelo" class="image" />
+                            }
+                            else
+                            {
+                                <img src="" alt="Sem imagem" class="image" />
+                            }
+                        </div>
+                        <div class="vehicle-content">
+                                <div class="vehicle-info">
+                                    <h3 class="vehicle-model">@vehicle.Marca @vehicle.Modelo | @vehicle.Ano</h3>
+                                    <p>Placa - @vehicle.Placa</p>
+                                    <p>Km: @(vehicle.Km.HasValue ? vehicle.Km.Value.ToString("N0") : "Não informado") km</p>
+                                    <p>Cor: @vehicle.Cor</p>
+                                </div>
+                                <div class="vehicle-actions-box">
+                                    <div class="vehicle-actions">
+                                        <a asp-page="/Vehicle" asp-route-id="@vehicle.Id" class="btn-edit">Editar</a>
+                                        <p>Fotos - @(vehicle.VehicleImgs != null ? vehicle.VehicleImgs.Count().ToString("D2") : "00")</p>
+                                        <p>Opcionais: @(string.IsNullOrEmpty(vehicle.Opcionais) ? "Não" : "Sim")</p>
+                                    </div>
+                                <p class="vehicle-price">R$ @vehicle.Preco.ToString("N2")</p>
+                                </div>
+                        </div>
+
+                        
+                    </div>
+                }
+            }
+            else
+            {
+                <p>Nenhum veículo encontrado.</p>
+            }
+        </div>
+
+        <div class="packages">
+            @if (Model.ICarros.Any() || Model.WebMotors.Any())
+            {
+                <div class="portal-container">
+                    <div class="portal">
+                        <h2>ICarros</h2>
+                        <div class="packages-list">
+                            @foreach (var package in Model.ICarros)
+                            {
+                                <div class="package-item">
+                                    <h3 class="package-name">@package.Name</h3>
+                                    <div class="package-selection">
+                                        <input type="radio" name="icarros" value="@package.Id" />
+                                        <p style="color: red;">@package.Used.ToString("D3")</p>
+                                        <span>-</span>
+                                        <p style="color: green">@package.Available.ToString("D3")</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="portal">
+                        <h2>WebMotors</h2>
+                        <div class="packages-list">
+                            @foreach (var package in Model.WebMotors)
+                            {
+                                <div class="package-item">
+                                    <h3 class="package-name">@package.Name</h3>
+                                    <div class="package-selection">
+                                        <input type="radio" name="webmotors" value="@package.Id" />
+                                        <p style="color: red;">@package.Used.ToString("D3")</p>
+                                        <span>-</span>
+                                        <p style="color: green">@package.Available.ToString("D3")</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <p>Nenhum pacote encontrado.</p>
+            }
+        </div>
+    </section>
+</div>
+
+<script>
+    function validateYears() {
+        var anoMin = parseInt(document.getElementById('anoMin').value);
+        var anoMax = parseInt(document.getElementById('anoMax').value);
+
+        if (anoMin > anoMax) {
+            alert('Ano Min não pode ser maior que Ano Max.');
+            return false;
         }
-    </ul>
-}
-else
-{
-    <p>Nenhum pacote encontrado.</p>
-}
+        return true;
+    }
+</script>

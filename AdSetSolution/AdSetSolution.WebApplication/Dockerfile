@@ -1,25 +1,24 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
+# Use a imagem SDK para desenvolvimento
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Copie os arquivos do projeto e restaure as dependências
 COPY ["AdSetSolution.WebApplication/AdSetSolution.WebApplication.csproj", "AdSetSolution.WebApplication/"]
+COPY ["AdSetSolution.Infrastructure/AdSetSolution.Infrastructure.csproj", "AdSetSolution.Infrastructure/"]
+COPY ["AdSetSolution.Application/AdSetSolution.Application.csproj", "AdSetSolution.Application/"]
+COPY ["AdSetSolution.Data/AdSetSolution.Domain.csproj", "AdSetSolution.Data/"]
+COPY ["AdSetSolution.ServiceDefaults/AdSetSolution.ServiceDefaults.csproj", "AdSetSolution.ServiceDefaults/"]
 RUN dotnet restore "./AdSetSolution.WebApplication/AdSetSolution.WebApplication.csproj"
+
+# Copie o restante do código
 COPY . .
+
+# Instale o dotnet-watch para monitoramento
+RUN dotnet tool install --global dotnet-watch
+
+# Defina o PATH para incluir o dotnet-watch
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+# Execute dotnet-watch para desenvolvimento
 WORKDIR "/src/AdSetSolution.WebApplication"
-RUN dotnet build "./AdSetSolution.WebApplication.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./AdSetSolution.WebApplication.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "AdSetSolution.WebApplication.dll"]
+ENTRYPOINT ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:8080"]

@@ -1,10 +1,8 @@
 ﻿using AdSetSolution.Domain.Interfaces;
 using AdSetSolution.Domain.Models;
 using AdSetSolution.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace AdSetSolution.Infrastructure.Repositories
 {
@@ -23,7 +21,15 @@ namespace AdSetSolution.Infrastructure.Repositories
         {
             try
             {
-                await _context.VehicleImgs.AddAsync(vehicleImg);
+                var existingImage = await _context.VehicleImgs
+                    .FirstOrDefaultAsync(img => img.FileName == vehicleImg.FileName && img.VehicleId == vehicleImg.VehicleId);
+
+                if (existingImage != null)
+                {
+                    return false;
+                }
+
+                _context.VehicleImgs.Add(vehicleImg);
                 int result = await _context.SaveChangesAsync();
                 return result > 0;
             }

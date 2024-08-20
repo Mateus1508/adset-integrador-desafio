@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>a2aeecdf-a7cf-4595-bccf-1409db973a16</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AdSetSolution.Infrastructure\AdSetSolution.Infrastructure.csproj" />
+    <ProjectReference Include="..\AdSetSolution.ServiceDefaults\AdSetSolution.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

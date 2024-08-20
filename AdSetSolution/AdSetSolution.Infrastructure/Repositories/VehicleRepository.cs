@@ -1,4 +1,5 @@
-﻿using AdSetSolution.Domain.Interfaces;
+﻿using AdSetSolution.Application.DTOs;
+using AdSetSolution.Domain.Interfaces;
 using AdSetSolution.Domain.Models;
 using AdSetSolution.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -17,15 +18,59 @@ namespace AdSetSolution.Infrastructure.Repositories
             _logger = logger;
         }
 
-        public async Task<IEnumerable<Vehicle>> GetAllVehicles()
+        public async Task<IEnumerable<Vehicle>> GetFilteredVehicles(VehicleFilter filter)
         {
             try
             {
-                return await _context.Vehicles.ToListAsync();
+                var query = _context.Vehicles
+                    .Include(v => v.VehicleImgs)
+                    .AsQueryable();
+
+                if (!string.IsNullOrEmpty(filter.Marca))
+                    query = query.Where(v => v.Marca.Contains(filter.Marca));
+
+                if (!string.IsNullOrEmpty(filter.Modelo))
+                    query = query.Where(v => v.Modelo.Contains(filter.Modelo));
+
+                if (filter.AnoMin.HasValue)
+                    query = query.Where(v => v.Ano >= filter.AnoMin.Value);
+
+                if (filter.AnoMax.HasValue)
+                    query = query.Where(v => v.Ano <= filter.AnoMax.Value);
+
+                if (!string.IsNullOrEmpty(filter.Placa))
+                    query = query.Where(v => v.Placa.Contains(filter.Placa));
+
+                if (!string.IsNullOrEmpty(filter.Cor))
+                    query = query.Where(v => v.Cor.Contains(filter.Cor));
+
+                if (!string.IsNullOrEmpty(filter.Preco))
+                {
+                    var precoRange = filter.Preco;
+                    if (precoRange == "10000-50000")
+                        query = query.Where(v => v.Preco >= 10000 && v.Preco <= 50000);
+                    else if (precoRange == "50000-90000")
+                        query = query.Where(v => v.Preco > 50000 && v.Preco <= 90000);
+                    else if (precoRange == "90000+")
+                        query = query.Where(v => v.Preco > 90000);
+                }
+
+                if(!string.IsNullOrEmpty(filter.Fotos))
+                {
+                    if (filter.Fotos == "ComFotos")
+                        query = query.Where(v => v.VehicleImgs != null && v.VehicleImgs.Any());
+                    else if (filter.Fotos == "SemFotos")
+                        query = query.Where(v => v.VehicleImgs == null || !v.VehicleImgs.Any());
+                }
+
+                if (!string.IsNullOrEmpty(filter.Opcionais))
+                    query = query.Where(v => v.Opcionais.Contains(filter.Opcionais));
+
+                return await query.ToListAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao obter todos os veículos.");
+                _logger.LogError(ex, "Erro ao filtrar veículos.");
                 throw;
             }
         }
@@ -34,7 +79,9 @@ namespace AdSetSolution.Infrastructure.Repositories
         {
             try
             {
-                return await _context.Vehicles.FindAsync(id);
+                return await _context.Vehicles
+                    .Include(v => v.VehicleImgs)
+                    .FirstOrDefaultAsync(v => v.Id == id);
             }
             catch (Exception ex)
             {
@@ -43,13 +90,15 @@ namespace AdSetSolution.Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> AddVehicle(Vehicle vehicle)
+        public async Task<int> AddVehicle(Vehicle vehicle)
         {
             try
             {
                 await _context.Vehicles.AddAsync(vehicle);
-                int result = await _context.SaveChangesAsync();
-                return result > 0;
+
+                await _context.SaveChangesAsync();
+
+                return vehicle.Id;
             }
             catch (Exception ex)
             {

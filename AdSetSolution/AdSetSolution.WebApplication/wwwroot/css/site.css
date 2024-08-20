@@ -13,10 +13,297 @@ html {
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
+    background-color: #eeeeee;
 }
 
 body {
-  margin-bottom: 60px;
+    background-color: #eeeeee;
+}
+
+* {
+    margin: 0 !important;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Conteúdo da parte de navegação no topo */
+.info-box {
+    display: flex;
+    background-color: #eeeeee;
+    padding: 10px 0;
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 5px 20px;
+}
+
+    .info-item.border-curve {
+        position: relative;
+        margin: 0 10px;
+    }
+
+        .info-item.border-curve::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: -10px;
+            right: -10px;
+            height: 50%;
+            border-left: 1px solid #bbbbbb;
+            border-right: 1px solid #bbbbbb;
+            transform: skewX(-20deg) translateY(-50%);
+            transform-origin: 0% 0%;
+            pointer-events: none;
+        }
+
+    .info-item.pipe {
+        border-left: 1px solid #bbbbbb;
+        border-right: 1px solid #bbbbbb;
+        padding: 10px 20px;
+        margin: 10px 0;
+    }
+
+h2 {
+    font-size: 18px;
+    font-weight: 400;
+    color: #777777;
+}
+
+h3 {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.buttons {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    padding-right: 20px;
+}
+
+/* Campo de filtragem */
+
+.search-params {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.input-box {
+    display: flex;
+    gap: 10px;
+    background-color: #ffffff;
+    padding: 15px 10px;
+    border: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.filter-input-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.filter-input {
+    border-radius: 20px;
+    border: 1px solid #aaaaaa;
+    background-color: #eeeeee;
+    text-align: center;
+    width: max-content;
+    min-width: 150px;
+}
+
+.filter-select {
+    border-radius: 20px;
+    border: 1px solid #aaaaaa;
+    background-color: #eeeeee;
+    text-align: center;
+    min-width: 100px;
+}
+
+.search-button {
+    background-color: #55a630;
+    color: white;
+    padding: 5px 20px;
+    cursor: pointer;
+    border: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    transition: background-color 0.3s;
+}
+
+    .search-button:hover {
+        background-color: #081c15;
+    }
+
+/* Listagens */
+
+.registers {
+    display: flex;
+    gap: 10px;
+}
+
+/* Listagem dos veículos */
+.vehicles {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 10px;
+}
+
+.vehicle-item {
+    display: flex;
+    align-items: center;
+    padding-left: 15px;
+    justify-content: space-between;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    width: 50vw;
+}
+
+.vehicle-image {
+    flex: 0 0 auto;
+    margin: 1rem;
+    width: 150px;
+}
+
+    .vehicle-image .image {
+        width: 150px;
+        height: auto;
+        border-radius: 8px;
+        object-fit: cover;
+        padding: 0 10px;
+    }
+
+
+
+.vehicle-content {
+    display: flex;
+    height: 100%;
+    margin-left: 20px;
+    justify-content: space-between;
+    align-items:center;
+    flex: 1;
+}
+
+.vehicle-actions-box {
+    display: flex;
+    flex-direction: column;
+    align-self: end;
+    gap: 5px;
+}
+
+.vehicle-info {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    gap: 5px;
+}
+
+.vehicle-actions {
+    display: flex;
+    align-self: end;
+    gap: 5px;
+    padding: 5px 10px;
+}
+
+.vehicle-model {
+    padding: 5px 10px;
+    min-width: 200px;
+    border-radius: 10px;
+    background: #dddddd;
+}
+
+.vehicle-price {
+    background: #eee;
+    padding: 5px 15px;
+    text-align: right;
+}
+
+/* portais e pacotes */
+
+.packages {
+    display: flex;
+    flex-direction: column;
+}
+
+.portal-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Space between the portals */
+}
+
+.portal {
+    flex: 1;
+    padding: 10px;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    text-align: center;
+    width: 140px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.packages-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.package-item {
+    margin-bottom: 5px;
+    padding: 5px;
+    border-radius: 3px;
+    text-align: justify;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.package-name {
+    font-weight: 400;
+}
+
+.package-selection {
+    display: flex;
+    gap: 5px;
+}
+
+/* add/update veiculo */
+
+#newImagesContainer, #existingImagesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 100px;
+    gap: 10px;
+    border: 1px solid #bbbbbb;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.new-image, .existing-image {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #bbbbbb;
+    border-radius: 10px;
+    gap: 10px;
+    padding: 10px;
 }

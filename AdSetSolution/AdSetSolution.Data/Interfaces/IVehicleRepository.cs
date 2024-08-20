@@ -4,9 +4,9 @@ namespace AdSetSolution.Domain.Interfaces
 {
     public interface IVehicleRepository
     {
-        Task<IEnumerable<Vehicle>> GetAllVehicles();
+        Task<IEnumerable<Vehicle>> GetFilteredVehicles(VehicleFilter filter);
         Task<Vehicle> GetVehicleById(int id);
-        Task<bool> AddVehicle(Vehicle vehicle);
+        Task<int> AddVehicle(Vehicle vehicle);
         Task<bool> UpdateVehicle(Vehicle vehicle);
         Task<bool> DeleteVehicle(int id);
     }

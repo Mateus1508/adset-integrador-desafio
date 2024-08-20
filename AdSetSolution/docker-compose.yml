@@ -10,6 +10,20 @@ services:
       - "1433:1433"
     networks:
       - app-network
+  webapplication:
+    build:
+        context: .
+        dockerfile: AdSetSolution.WebApplication/Dockerfile
+    container_name: adset_webapp_container
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+        - "8080:8080"
+    volumes:
+        - .:/src
+    networks:
+        - app-network
+  
 
 networks:
     app-network:

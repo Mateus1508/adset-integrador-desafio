@@ -20,11 +20,21 @@ namespace AdSetSolution.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<OperationReturn> GetAllVehicles()
+        public async Task<OperationReturn> GetFilteredVehicles(VehicleFilter filter)
         {
             try
             {
-                var vehicles = await _repository.GetAllVehicles();
+                var vehicles = await _repository.GetFilteredVehicles(filter);
+
+                if (vehicles == null || !vehicles.Any())
+                {
+                    return new OperationReturn
+                    {
+                        Success = false,
+                        Message = "Nenhum veículo encontrado."
+                    };
+                }
+
                 var vehicleDtos = _mapper.Map<IEnumerable<VehicleDTO>>(vehicles);
 
                 return new OperationReturn
@@ -90,7 +100,7 @@ namespace AdSetSolution.Application.Services
             try
             {
                 var vehicle = _mapper.Map<Vehicle>(vehicleDto);
-                bool isVehicleAdded = await _repository.AddVehicle(vehicle);
+                int vehicleAddedId = await _repository.AddVehicle(vehicle);
 
                 var imageOperationResult = new OperationReturn
                 {
@@ -98,7 +108,7 @@ namespace AdSetSolution.Application.Services
                     Message = "Veículo adicionado com sucesso."
                 };
 
-                if (isVehicleAdded && vehicleDto.VehicleImgs.Count > 0)
+                if (vehicleAddedId > 0 && vehicleDto.VehicleImgs.Count > 0)
                 {
                     bool allImagesAdded = true;
 
@@ -109,6 +119,7 @@ namespace AdSetSolution.Application.Services
                             continue;
                         }
 
+                        vehicleImgDto.VehicleId = vehicleAddedId;
                         var image = _mapper.Map<VehicleImg>(vehicleImgDto);
                         bool imageAdded = await _vehicleImgRepository.AddImage(image);
 
@@ -126,7 +137,7 @@ namespace AdSetSolution.Application.Services
 
                 return new OperationReturn
                 {
-                    Success = isVehicleAdded,
+                    Success = vehicleAddedId > 0,
                     Message = imageOperationResult.Message
                 };
             }
@@ -173,6 +184,7 @@ namespace AdSetSolution.Application.Services
                             continue;
                         }
 
+                        vehicleImgDto.VehicleId = vehicleDto.Id;
                         var image = _mapper.Map<VehicleImg>(vehicleImgDto);
                         bool imageAdded = await _vehicleImgRepository.AddImage(image);
 
@@ -226,6 +238,51 @@ namespace AdSetSolution.Application.Services
                     Message = $"Erro ao excluir veículo: {ex.Message}"
                 };
             }
+        }
+
+        private IEnumerable<Vehicle> ApplyFilters(IEnumerable<Vehicle> vehicles, VehicleDTO filter)
+        {
+            if (!string.IsNullOrEmpty(filter.Marca))
+            {
+                vehicles = vehicles.Where(v => v.Marca.Contains(filter.Marca, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrEmpty(filter.Modelo))
+            {
+                vehicles = vehicles.Where(v => v.Modelo.Contains(filter.Modelo, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (filter.Ano > 0)
+            {
+                vehicles = vehicles.Where(v => v.Ano == filter.Ano);
+            }
+
+            if (!string.IsNullOrEmpty(filter.Placa))
+            {
+                vehicles = vehicles.Where(v => v.Placa.Contains(filter.Placa, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (filter.Km > 0)
+            {
+                vehicles = vehicles.Where(v => v.Km == filter.Km);
+            }
+
+            if (!string.IsNullOrEmpty(filter.Cor))
+            {
+                vehicles = vehicles.Where(v => v.Cor.Contains(filter.Cor, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (filter.Preco > 0)
+            {
+                vehicles = vehicles.Where(v => v.Preco == filter.Preco);
+            }
+
+            if (!string.IsNullOrEmpty(filter.Opcionais))
+            {
+                vehicles = vehicles.Where(v => v.Opcionais.Contains(filter.Opcionais, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return vehicles;
         }
     }
 }
