@@ -21,38 +21,18 @@ namespace AdSetSolution.Infrastructure.Repositories
             _logger = logger;
         }
 
-        public async Task<VehiclePackage> GetVehiclePackageByVehicleId(int vehicleId)
+        public async Task<List<VehiclePackage>> GetVehiclePackagesByVehicleId(int vehicleId)
         {
-            try
-            {
-                return await _context.VehiclePackages.FirstOrDefaultAsync(vp => vp.VehicleId == vehicleId);
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erro ao obter o pacote do veículo com Id {id}.", vehicleId);
-                throw;
-            }
+            return await _context.VehiclePackages
+                .Where(vp => vp.VehicleId == vehicleId)
+                .ToListAsync();
         }
 
-        public async Task<VehiclePackage> GetVehiclePackageByVehicleIdAndPortalType(int vehicleId, PortalType portalType)
+        public async Task<bool> AddVehiclePackage(IEnumerable<VehiclePackage> vehiclePackages)
         {
             try
             {
-                return await _context.VehiclePackages.FirstOrDefaultAsync(vp => vp.VehicleId == vehicleId && vp.PortalType == portalType);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erro ao obter o pacote do veículo com Id {id}.", vehicleId);
-                throw;
-            }
-        }
-
-        public async Task<bool> AddVehiclePackage(VehiclePackage vehiclePackage)
-        {
-            try
-            {
-                await _context.VehiclePackages.AddAsync(vehiclePackage);
+                await _context.VehiclePackages.AddRangeAsync(vehiclePackages);
                 int result = await _context.SaveChangesAsync();
                 return result > 0;
             }
@@ -63,40 +43,18 @@ namespace AdSetSolution.Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> UpdateVehiclePackage(VehiclePackage vehiclePackage)
+        public async Task<bool> DeleteVehiclePackage(IEnumerable<VehiclePackage> vehiclePackages)
         {
             try
             {
-                _context.VehiclePackages.Update(vehiclePackage);
+                _context.VehiclePackages.RemoveRange(vehiclePackages);
                 int result = await _context.SaveChangesAsync();
                 return result > 0;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao atualizar pacote do veículo com Id {id}.", vehiclePackage.VehicleId);
-                throw;
-            }
-        }
-
-        public async Task<bool> DeleteVehiclePackage(VehiclePackage vehiclePackage)
-        {
-            try
-            {
-                var getVehiclePackage = await _context.VehiclePackages
-                    .FirstOrDefaultAsync(vp => vp.VehicleId == vehiclePackage.VehicleId && vp.PackageId == vehiclePackage.PackageId && vp.PortalType == vehiclePackage.PortalType);
-
-                if (getVehiclePackage != null)
-                {
-                    _context.VehiclePackages.Remove(getVehiclePackage);
-                    int result = await _context.SaveChangesAsync();
-                    return result > 0;
-                }
-
-                return false;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erro ao excluir pacote do veículo com Id {id} e Pacote com Id {PackageId}.", vehiclePackage.VehicleId, vehiclePackage.PackageId);
+                var vehiclePackageIds = string.Join(", ", vehiclePackages.Select(vp => $"VehicleId: {vp.VehicleId}, PackageId: {vp.PackageId}"));
+                _logger.LogError(ex, "Erro ao excluir os seguintes pacotes de veículos: {VehiclePackages}.", vehiclePackageIds);
                 throw;
             }
         }

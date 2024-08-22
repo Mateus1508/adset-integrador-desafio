@@ -2,14 +2,14 @@
 {
     public class VehicleFilter
     {
-        public string Marca { get; set; }
-        public string Modelo { get; set; }
-        public int? AnoMin { get; set; }
-        public int? AnoMax { get; set; }
-        public string Placa { get; set; }
-        public string? Fotos { get; set; }
-        public string Cor { get; set; }
-        public string? Preco { get; set; }
-        public string Opcionais { get; set; }
+        public string Brand { get; set; } = string.Empty;
+        public string Model { get; set; } = string.Empty;
+        public int? YearMin { get; set; }
+        public int? YearMax { get; set; }
+        public string LicensePlate { get; set; } = string.Empty;
+        public string? Photos { get; set; }
+        public string Color { get; set; } = string.Empty;
+        public string? Price { get; set; }
+        public ICollection<int> VehicleOptionalIds { get; set; } = new List<int>();
     }
 }

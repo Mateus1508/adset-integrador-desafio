@@ -20,6 +20,6 @@ namespace AdSetSolution.Domain.Models
         [MaxLength(20)]
         public string? ContentType { get; set; }
 
-        public virtual Vehicle Vehicle { get; set; }
+        public virtual Vehicle Vehicle { get; }
     }
 }

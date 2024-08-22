@@ -20,49 +20,50 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label asp-for="Vehicle.Marca"></label>
-                    <input asp-for="Vehicle.Marca" class="form-control" />
-                    <span asp-validation-for="Vehicle.Marca" class="text-danger"></span>
+                    <label asp-for="Vehicle.Brand">Marca</label>
+                    <input asp-for="Vehicle.Brand" class="form-control" />
+                    <span asp-validation-for="Vehicle.Brand" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Vehicle.Modelo"></label>
-                    <input asp-for="Vehicle.Modelo" class="form-control" />
-                    <span asp-validation-for="Vehicle.Modelo" class="text-danger"></span>
+                    <label asp-for="Vehicle.Model">Modelo</label>
+                    <input asp-for="Vehicle.Model" class="form-control" />
+                    <span asp-validation-for="Vehicle.Model" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Vehicle.Ano"></label>
-                    <input asp-for="Vehicle.Ano" class="form-control" />
-                    <span asp-validation-for="Vehicle.Ano" class="text-danger"></span>
+                    <label asp-for="Vehicle.Year">Ano</label>
+                    <input asp-for="Vehicle.Year" class="form-control" />
+                    <span asp-validation-for="Vehicle.Year" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Vehicle.Placa"></label>
-                    <input asp-for="Vehicle.Placa" class="form-control" />
-                    <span asp-validation-for="Vehicle.Placa" class="text-danger"></span>
+                    <label asp-for="Vehicle.LicensePlate">Placa</label>
+                    <input asp-for="Vehicle.LicensePlate" class="form-control" />
+                    <span asp-validation-for="Vehicle.LicensePlate" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Vehicle.Km"></label>
-                    <input asp-for="Vehicle.Km" class="form-control" />
-                    <span asp-validation-for="Vehicle.Km" class="text-danger"></span>
+                    <label asp-for="Vehicle.Mileage">Km</label>
+                    <input asp-for="Vehicle.Mileage" class="form-control" />
+                    <span asp-validation-for="Vehicle.Mileage" class="text-danger"></span>
                 </div>
-            <div class="form-group mt-2">
-                <button type="submit" class="btn btn-primary">Salvar</button>
-            </div>
+                <div class="form-group mt-2">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="button" onclick="window.location.href='/'" class="btn btn-danger">Cancelar</button>
+                </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label asp-for="Vehicle.Cor"></label>
-                    <input asp-for="Vehicle.Cor" class="form-control" />
-                    <span asp-validation-for="Vehicle.Cor" class="text-danger"></span>
+                    <label asp-for="Vehicle.Color">Cor</label>
+                    <input asp-for="Vehicle.Color" class="form-control" />
+                    <span asp-validation-for="Vehicle.Color" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Vehicle.Preco"></label>
-                    <input asp-for="Vehicle.Preco" class="form-control" />
-                    <span asp-validation-for="Vehicle.Preco" class="text-danger"></span>
+                    <label asp-for="Vehicle.Price">Preço</label>
+                    <input asp-for="Vehicle.Price" class="form-control" />
+                    <span asp-validation-for="Vehicle.Price" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Vehicle.Opcionais"></label>
-                    <textarea asp-for="Vehicle.Opcionais" class="form-control"></textarea>
-                    <span asp-validation-for="Vehicle.Opcionais" class="text-danger"></span>
+                    <label asp-for="Vehicle.VehicleOptionals">Opcionais</label>
+                    <textarea asp-for="Vehicle.VehicleOptionals" class="form-control"></textarea>
+                    <span asp-validation-for="Vehicle.VehicleOptionals" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label for="VehicleImgs">Imagens</label>

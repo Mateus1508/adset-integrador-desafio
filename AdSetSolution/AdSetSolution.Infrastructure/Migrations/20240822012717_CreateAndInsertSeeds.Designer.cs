@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdSetSolution.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240818225502_CreateAndSeedPackageTable")]
-    partial class CreateAndSeedPackageTable
+    [Migration("20240822012717_CreateAndInsertSeeds")]
+    partial class CreateAndInsertSeeds
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace AdSetSolution.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AdSetSolution.Domain.Models.Package", b =>
+            modelBuilder.Entity("AdSetSolution.Domain.Models.Optional", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,13 +38,27 @@ namespace AdSetSolution.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.HasKey("Id");
+
+                    b.ToTable("Optionals");
+                });
+
+            modelBuilder.Entity("AdSetSolution.Domain.Models.Package", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("PortalType")
                         .HasColumnType("int");
 
                     b.Property<int>("Total")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Used")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -60,37 +74,33 @@ namespace AdSetSolution.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Ano")
-                        .HasColumnType("int");
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Cor")
+                    b.Property<string>("Color")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("Km")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Marca")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Modelo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Opcionais")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Placa")
+                    b.Property<string>("LicensePlate")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<int>("Preco")
+                    b.Property<int?>("Mileage")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -128,6 +138,23 @@ namespace AdSetSolution.Infrastructure.Migrations
                     b.ToTable("VehicleImgs");
                 });
 
+            modelBuilder.Entity("AdSetSolution.Domain.Models.VehicleOptional", b =>
+                {
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.Property<int>("OptionalId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.HasKey("VehicleId", "OptionalId");
+
+                    b.HasIndex("OptionalId");
+
+                    b.ToTable("VehicleOptional");
+                });
+
             modelBuilder.Entity("AdSetSolution.Domain.Models.VehiclePackage", b =>
                 {
                     b.Property<int>("VehicleId")
@@ -160,23 +187,47 @@ namespace AdSetSolution.Infrastructure.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("AdSetSolution.Domain.Models.VehicleOptional", b =>
+                {
+                    b.HasOne("AdSetSolution.Domain.Models.Optional", "Optional")
+                        .WithMany("VehicleOptional")
+                        .HasForeignKey("OptionalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AdSetSolution.Domain.Models.Vehicle", "Vehicle")
+                        .WithMany("VehicleOptional")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Optional");
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("AdSetSolution.Domain.Models.VehiclePackage", b =>
                 {
                     b.HasOne("AdSetSolution.Domain.Models.Package", "Package")
                         .WithMany("VehiclePackages")
                         .HasForeignKey("PackageId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AdSetSolution.Domain.Models.Vehicle", "Vehicle")
                         .WithMany("VehiclePackages")
                         .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Package");
 
                     b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("AdSetSolution.Domain.Models.Optional", b =>
+                {
+                    b.Navigation("VehicleOptional");
                 });
 
             modelBuilder.Entity("AdSetSolution.Domain.Models.Package", b =>
@@ -187,6 +238,8 @@ namespace AdSetSolution.Infrastructure.Migrations
             modelBuilder.Entity("AdSetSolution.Domain.Models.Vehicle", b =>
                 {
                     b.Navigation("VehicleImgs");
+
+                    b.Navigation("VehicleOptional");
 
                     b.Navigation("VehiclePackages");
                 });

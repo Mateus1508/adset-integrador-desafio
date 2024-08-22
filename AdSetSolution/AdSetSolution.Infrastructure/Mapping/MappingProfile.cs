@@ -16,6 +16,10 @@ namespace AdSetSolution.Infrastructure.Mapping
                 .ReverseMap();
             CreateMap<Package, PackageDTO>()
                 .ReverseMap();
+            CreateMap<Optional, OptionalDTO>()
+                .ReverseMap();
+            CreateMap<VehicleOptional, VehicleOptionalDTO>()
+                .ReverseMap();
         }
     }
 }

@@ -22,78 +22,71 @@ namespace AdSetSolution.Application.Services
 
         public async Task<OperationReturn> GetAllPackages()
         {
+            var operationReturn = new OperationReturn();
+
             try
             {
                 var packages = await _repository.GetAllPackages();
                 var packageDtos = _mapper.Map<IEnumerable<PackageDTO>>(packages);
 
-                return new OperationReturn
-                {
-                    Success = true,
-                    Data = packageDtos,
-                    Message = "Pacotes retornados com sucesso."
-                };
+                operationReturn.Success = true;
+                operationReturn.Data = packageDtos;
+                operationReturn.Message = "Pacotes retornados com sucesso.";
             }
             catch (Exception ex)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao retornar pacotes: {ex.Message}"
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = $"Erro ao retornar pacotes: {ex.Message}";
             }
+
+            return operationReturn;
         }
 
         public async Task<OperationReturn> GetPackageById(int id)
-        {
-            if (id <= 0)
-            {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = "Id inválido."
-                };
-            }
+        {           
+            var operationReturn = new OperationReturn();
 
             try
             {
+
+                if (id <= 0)
+                {
+                    operationReturn.Success = false;
+                    operationReturn.Message = "Id inválido.";
+                    return operationReturn;
+                }
+
                 var package = await _repository.GetPackageById(id);
                 if (package == null)
                 {
-                    return new OperationReturn
-                    {
-                        Success = false,
-                        Message = $"Pacote com Id {id} não encontrado."
-                    };
+                    operationReturn.Success = false;
+                    operationReturn.Message = $"Pacote com Id {id} não encontrado.";
+                    return operationReturn;
                 }
 
                 var packageDto = _mapper.Map<PackageDTO>(package);
-                return new OperationReturn
-                {
-                    Success = true,
-                    Data = packageDto,
-                    Message = "Pacote retornado com sucesso."
-                };
+                operationReturn.Success = true;
+                operationReturn.Data = packageDto;
+                operationReturn.Message = "Pacote retornado com sucesso.";
+                return operationReturn;
             }
             catch (Exception ex)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao retornar pacote: {ex.Message}"
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = $"Erro ao retornar pacote: {ex.Message}";
+                return operationReturn;
             }
         }
 
         public async Task<OperationReturn> GetPackageByPortalType(PortalType portalType)
         {
-            if (portalType != PortalType.ICarros || portalType != PortalType.WebMotors)
+            var operationReturn = new OperationReturn();
+
+            if (portalType != PortalType.ICarros && portalType != PortalType.WebMotors)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = "Portal inválido."
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = "Portal inválido.";
+                return operationReturn;
             }
 
             try
@@ -101,29 +94,24 @@ namespace AdSetSolution.Application.Services
                 var package = await _repository.GetPackageByPortalType(portalType);
                 if (package == null)
                 {
-                    return new OperationReturn
-                    {
-                        Success = false,
-                        Message = $"Pacote do portal {portalType.getPortalName()} não encontrado."
-                    };
+                    operationReturn.Success = false;
+                    operationReturn.Message = $"Pacote do portal {portalType.getPortalName()} não encontrado.";
+                    return operationReturn;
                 }
 
                 var packageDto = _mapper.Map<PackageDTO>(package);
-                return new OperationReturn
-                {
-                    Success = true,
-                    Data = packageDto,
-                    Message = "Pacote retornado com sucesso."
-                };
+                operationReturn.Success = true;
+                operationReturn.Data = packageDto;
+                operationReturn.Message = "Pacote retornado com sucesso.";
             }
             catch (Exception ex)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao retornar pacote: {ex.Message}"
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = $"Erro ao retornar pacote: {ex.Message}";
             }
+
+            return operationReturn;
         }
+
     }
 }

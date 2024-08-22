@@ -9,35 +9,34 @@ namespace AdSetSolution.Domain.Models
 
         [Required]
         [MaxLength(100)]
-        public string Marca { get; set; }
+        public string Brand { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(100)]
-        public string Modelo { get; set; }
+        public string Model { get; set; } = string.Empty;
 
         [Required]
         [Range(2000, 2024)]
-        public int Ano { get; set; }
+        public int Year { get; set; }
 
         [Required]
         [MaxLength(10)]
-        public string Placa { get; set; }
+        public string LicensePlate { get; set; } = string.Empty;
 
-        public int? Km { get; set; }
+        public int? Mileage { get; set; }
 
         [Required]
         [MaxLength(50)]
-        public string Cor { get; set; }
+        public string Color { get; set; } = string.Empty;
 
         [Required]
         [Range(10000, int.MaxValue)]
-        public int Preco { get; set; }
-
-        [MaxLength(1000)]
-        public string? Opcionais { get; set; }
+        public int Price { get; set; }
 
         public virtual ICollection<VehicleImg> VehicleImgs { get; set; } = new List<VehicleImg>();
 
-        public ICollection<VehiclePackage> VehiclePackages { get; set; }
+        public virtual ICollection<VehiclePackage> VehiclePackages { get; set; } = new List<VehiclePackage>();
+
+        public virtual ICollection<VehicleOptional> VehicleOptional { get; set; } = new List<VehicleOptional>();
     }
 }

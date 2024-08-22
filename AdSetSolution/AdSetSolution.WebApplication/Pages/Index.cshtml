@@ -25,7 +25,7 @@
             </h2>
         </div>
         <div class="buttons">
-            <button class="btn btn-primary">Adicionar veículo</button>
+            <a asp-page="/Vehicle" class="btn btn-primary">Adicionar veículo</a>
             <button class="btn btn-warning">Salvar</button>
         </div>
     </section>
@@ -33,20 +33,20 @@
         <form method="post" class="search-params" onsubmit="return validateYears()">
             <div class="input-box">
                 <div class="filter-input-box">
-                    <label asp-for="Filter.Placa"></label>
-                    <input asp-for="Filter.Placa" class="filter-input" style="width: 150px;" />
+                    <label asp-for="Filter.LicensePlate">Placa</label>
+                    <input asp-for="Filter.LicensePlate" class="filter-input" style="width: 150px;" />
                 </div>
                 <div class="filter-input-box">
-                    <label asp-for="Filter.Marca"></label>
-                    <input asp-for="Filter.Marca" class="filter-input" style="width: 150px;" />
+                    <label asp-for="Filter.Brand">Marca</label>
+                    <input asp-for="Filter.Brand" class="filter-input" style="width: 150px;" />
                 </div>
                 <div class="filter-input-box">
-                    <label asp-for="Filter.Modelo"></label>
-                    <input asp-for="Filter.Modelo" class="filter-input" style="width: 200px;" />
+                    <label asp-for="Filter.Model">Modelo</label>
+                    <input asp-for="Filter.Model" class="filter-input" style="width: 200px;" />
                 </div>
                 <div class="filter-input-box">
-                    <label for="AnoMin">Ano Min</label>
-                    <select asp-for="Filter.AnoMin" id="AnoMin" class="filter-select">
+                    <label for="YearMin">Ano Min</label>
+                    <select asp-for="Filter.YearMin" id="YearMin" class="filter-select">
                         <option value="">Todos</option>
                         @for (int i = 2000; i <= 2024; i++)
                         {
@@ -55,8 +55,8 @@
                     </select>
                 </div>
                 <div class="filter-input-box">
-                    <label for="AnoMax">Ano Max</label>
-                    <select asp-for="Filter.AnoMax" id="AnoMax" class="filter-select">
+                    <label for="YearMax">Ano Max</label>
+                    <select asp-for="Filter.YearMax" id="YearMax" class="filter-select">
                         <option value="">Todos</option>
                         @for (int i = 2000; i <= 2024; i++)
                         {
@@ -65,26 +65,26 @@
                     </select>
                 </div>
                 <div class="filter-input-box">
-                    <label for="Fotos">Fotos</label>
-                    <select asp-for="Filter.Fotos" id="Fotos" class="filter-select">
+                    <label for="Photos">Fotos</label>
+                    <select asp-for="Filter.Photos" id="Photos" class="filter-select">
                         <option value="">Todos</option>
-                        <option value="ComFotos">Com fotos</option>
-                        <option value="SemFotos">Sem fotos</option>
+                        <option value="WithPhotos">Com fotos</option>
+                        <option value="WithoutPhotos">Sem fotos</option>
                     </select>
                 </div>
                 <div class="filter-input-box">
-                    <label for="Cor">Cor</label>
-                    <select asp-for="Filter.Cor" id="Cor" class="filter-select">
+                    <label for="Color">Cor</label>
+                    <select asp-for="Filter.Color" id="Color" class="filter-select">
                         <option value="">Todos</option>
-                        <option value="Branco">Branco</option>
-                        <option value="Cinza">Cinza</option>
-                        <option value="Preto">Preto</option>
-                        <option value="Vermelho">Vermelho</option>
+                        <option value="White">Branco</option>
+                        <option value="Gray">Cinza</option>
+                        <option value="Black">Preto</option>
+                        <option value="Red">Vermelho</option>
                     </select>
                 </div>
                 <div class="filter-input-box">
-                    <label for="Preco">Preço</label>
-                    <select asp-for="Filter.Preco" id="Preco" class="filter-select">
+                    <label for="Price">Preço</label>
+                    <select asp-for="Filter.Price" id="Price" class="filter-select">
                         <option value="">Todos</option>
                         <option value="10000-50000">10mil a 50mil</option>
                         <option value="50000-90000">50mil a 90mil</option>
@@ -92,8 +92,13 @@
                     </select>
                 </div>
                 <div class="filter-input-box">
-                    <label asp-for="Filter.Opcionais"></label>
-                    <input asp-for="Filter.Opcionais" class="filter-input" />
+                    <label for="Optional">Opcionais</label>
+                    <select asp-for="Filter.VehicleOptionalIds" id="Optional" class="filter-select">
+                        @foreach (var optional in Model.Optional)
+                        {
+                            <option value="@optional.Id">@optional.Name</option>
+                        }
+                    </select>
                 </div>
             </div>
 
@@ -114,7 +119,7 @@
                             @if (vehicle.VehicleImgs != null && vehicle.VehicleImgs.Any())
                             {
                                 var firstImage = vehicle.VehicleImgs.First();
-                                <img src="@firstImage.ImageBase64" alt="@vehicle.Modelo" class="image" />
+                                <img src="@firstImage.ImageBase64" alt="@vehicle.Model" class="image" />
                             }
                             else
                             {
@@ -122,23 +127,21 @@
                             }
                         </div>
                         <div class="vehicle-content">
-                                <div class="vehicle-info">
-                                    <h3 class="vehicle-model">@vehicle.Marca @vehicle.Modelo | @vehicle.Ano</h3>
-                                    <p>Placa - @vehicle.Placa</p>
-                                    <p>Km: @(vehicle.Km.HasValue ? vehicle.Km.Value.ToString("N0") : "Não informado") km</p>
-                                    <p>Cor: @vehicle.Cor</p>
+                            <div class="vehicle-info">
+                                <h3 class="vehicle-model">@vehicle.Brand @vehicle.Model | @vehicle.Year</h3>
+                                <p>Placa - @vehicle.LicensePlate</p>
+                                <p>Km: @(vehicle.Mileage.HasValue ? vehicle.Mileage.Value.ToString("N0") : "Não informado") km</p>
+                                <p>Cor: @vehicle.Color</p>
+                            </div>
+                            <div class="vehicle-actions-box">
+                                <div class="vehicle-actions">
+                                    <a asp-page="/Vehicle" asp-route-id="@vehicle.Id" class="btn-edit">Editar</a>
+                                    <p>Fotos - @(vehicle.VehicleImgs != null ? vehicle.VehicleImgs.Count().ToString("D2") : "00")</p>
+                                    @* <p>Opcionais: @(string.IsNullOrEmpty(vehicle.Options) ? "Não" : "Sim")</p> *@
                                 </div>
-                                <div class="vehicle-actions-box">
-                                    <div class="vehicle-actions">
-                                        <a asp-page="/Vehicle" asp-route-id="@vehicle.Id" class="btn-edit">Editar</a>
-                                        <p>Fotos - @(vehicle.VehicleImgs != null ? vehicle.VehicleImgs.Count().ToString("D2") : "00")</p>
-                                        <p>Opcionais: @(string.IsNullOrEmpty(vehicle.Opcionais) ? "Não" : "Sim")</p>
-                                    </div>
-                                <p class="vehicle-price">R$ @vehicle.Preco.ToString("N2")</p>
-                                </div>
+                                <p class="vehicle-price">R$ @vehicle.Price.ToString("N2")</p>
+                            </div>
                         </div>
-
-                        
                     </div>
                 }
             }

@@ -1,11 +1,11 @@
 ﻿using AdSetSolution.Application.DTOs;
 using AdSetSolution.Application.Utils;
+using AdSetSolution.Domain.Models;
 
 namespace AdSetSolution.Application.Interfaces
 {
     public interface IVehiclePackageService
     {
-        Task<OperationReturn> GetVehiclePackageByVehicleId(int vehicleId);
-        Task<OperationReturn> SetVehiclePackage(VehiclePackageDTO vehiclePackage);
+        Task<OperationReturn> SetVehiclePackages(IEnumerable<VehiclePackageDTO> vehiclePackagesDTO);
     }
 }

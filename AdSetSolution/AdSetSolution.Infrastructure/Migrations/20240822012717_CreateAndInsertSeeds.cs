@@ -5,20 +5,49 @@
 namespace AdSetSolution.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateAndSeedPackageTable : Migration
+    public partial class CreateAndInsertSeeds : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Optional",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Optionals", x => x.Id);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Optional",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Ar Condicionado" },
+                    { 2, "Alarme" },
+                    { 3, "Airbag" },
+                    { 4, "Freio ABS" },
+                    { 5, "Direção Hidráulica" },
+                    { 6, "Roda de Liga Leve" },
+                    { 7, "Vidro Elétrico" },
+                    { 8, "Sensor de Estacionamento" },
+                    { 9, "Câmera de Ré" },
+                    { 10, "Controle de Cruzeiro" }
+                });
+
             migrationBuilder.CreateTable(
                 name: "Packages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Total = table.Column<int>(type: "int", nullable: false),
-                    Used = table.Column<int>(type: "int", nullable: false),
                     PortalType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -28,13 +57,13 @@ namespace AdSetSolution.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                table: "Packages",
-               columns: new[] { "Id", "Name", "Total", "Used", "PortalType" },
+               columns: new[] { "Id", "Name", "Total", "PortalType" },
                values: new object[,]
                {
-                    { 1, "Diamante Feirão", 18, 10, 1 },
-                    { 2, "Diamante", 55, 30, 1 },
-                    { 3, "Platinum", 50, 40, 1 },
-                    { 4, "Básico", 55, 30, 2 }
+                    { 1, "Diamante Feirão", 18, 1 },
+                    { 2, "Diamante", 55, 1 },
+                    { 3, "Platinum", 50, 1 },
+                    { 4, "Básico", 55, 2 }
                });
 
             migrationBuilder.CreateTable(
@@ -43,14 +72,13 @@ namespace AdSetSolution.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Marca = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Modelo = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Ano = table.Column<int>(type: "int", nullable: false),
-                    Placa = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Km = table.Column<int>(type: "int", nullable: true),
-                    Cor = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Preco = table.Column<int>(type: "int", nullable: false),
-                    Opcionais = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true)
+                    Brand = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Model = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    LicensePlate = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Mileage = table.Column<int>(type: "int", nullable: true),
+                    Color = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Price = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -80,6 +108,30 @@ namespace AdSetSolution.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "VehicleOptional",
+                columns: table => new
+                {
+                    OptionalId = table.Column<int>(type: "int", nullable: false),
+                    VehicleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VehicleOptional", x => new { x.VehicleId, x.OptionalId });
+                    table.ForeignKey(
+                        name: "FK_VehicleOptional_Optionals_OptionalId",
+                        column: x => x.OptionalId,
+                        principalTable: "Optionals",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VehicleOptional_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "VehiclePackages",
                 columns: table => new
                 {
@@ -95,19 +147,24 @@ namespace AdSetSolution.Infrastructure.Migrations
                         column: x => x.PackageId,
                         principalTable: "Packages",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_VehiclePackages_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_VehicleImgs_VehicleId",
                 table: "VehicleImgs",
                 column: "VehicleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VehicleOptional_OptionalId",
+                table: "VehicleOptional",
+                column: "OptionalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VehiclePackages_PackageId",
@@ -122,7 +179,13 @@ namespace AdSetSolution.Infrastructure.Migrations
                 name: "VehicleImgs");
 
             migrationBuilder.DropTable(
+                name: "VehicleOptional");
+
+            migrationBuilder.DropTable(
                 name: "VehiclePackages");
+
+            migrationBuilder.DropTable(
+                name: "Optionals");
 
             migrationBuilder.DropTable(
                 name: "Packages");

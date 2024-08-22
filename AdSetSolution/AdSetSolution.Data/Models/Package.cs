@@ -10,23 +10,26 @@ namespace AdSetSolution.Domain.Models
         public int Id { get; set; }
 
         [Required]
-        [StringLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [Required]
         [Range(0, int.MaxValue)]
         public int Total { get; set; }
 
         [Required]
-        [Range(0, int.MaxValue)]
-        public int Used { get; set; }
+        public PortalType PortalType { get; set; }
+
+        [NotMapped]
+        public int Used => VehiclePackages.Count;
 
         [NotMapped]
         public int Available => Total - Used;
 
-        [Required]
-        public PortalType PortalType { get; set; }
+        [NotMapped]
+        public bool IsExhausted => Total == Used;
 
-        public ICollection<VehiclePackage> VehiclePackages { get; set; }
+        [Required]
+
+        public virtual ICollection<VehiclePackage> VehiclePackages { get; set; } = new List<VehiclePackage>();
     }
 }

@@ -22,144 +22,145 @@ namespace AdSetSolution.Application.Services
 
         public async Task<OperationReturn> GetFilteredVehicles(VehicleFilter filter)
         {
+            var operationReturn = new OperationReturn();
+
             try
             {
                 var vehicles = await _repository.GetFilteredVehicles(filter);
 
                 if (vehicles == null || !vehicles.Any())
                 {
-                    return new OperationReturn
-                    {
-                        Success = false,
-                        Message = "Nenhum veículo encontrado."
-                    };
+                    operationReturn.Success = false;
+                    operationReturn.Message = "Nenhum veículo encontrado.";
                 }
-
-                var vehicleDtos = _mapper.Map<IEnumerable<VehicleDTO>>(vehicles);
-
-                return new OperationReturn
+                else
                 {
-                    Success = true,
-                    Data = vehicleDtos,
-                    Message = "Veículos retornados com sucesso."
-                };
+                    var vehicleDtos = _mapper.Map<IEnumerable<VehicleDTO>>(vehicles);
+
+                    operationReturn.Success = true;
+                    operationReturn.Data = vehicleDtos;
+                    operationReturn.Message = "Veículos retornados com sucesso.";
+                }
             }
             catch (Exception ex)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao retornar veículos: {ex.Message}"
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = $"Erro ao retornar veículos: {ex.Message}";
             }
+
+            return operationReturn;
         }
 
         public async Task<OperationReturn> GetVehicleById(int id)
         {
-            if (id <= 0)
-            {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = "Id inválido."
-                };
-            }
+            var operationReturn = new OperationReturn();
+
 
             try
             {
-                var vehicle = await _repository.GetVehicleById(id);
-                if (vehicle == null)
+                if (id <= 0)
                 {
-                    return new OperationReturn
-                    {
-                        Success = false,
-                        Message = $"Veículo com Id {id} não encontrado."
-                    };
+                    operationReturn.Success = false;
+                    operationReturn.Message = "Id inválido.";
+                    return operationReturn;
                 }
 
-                var vehicleDto = _mapper.Map<VehicleDTO>(vehicle);
-                return new OperationReturn
+                var vehicle = await _repository.GetVehicleById(id);
+
+                if (vehicle == null)
                 {
-                    Success = true,
-                    Data = vehicleDto,
-                    Message = "Veículo retornado com sucesso."
-                };
+                    operationReturn.Success = false;
+                    operationReturn.Message = $"Veículo com Id {id} não encontrado.";
+                }
+                else
+                {
+                    var vehicleDto = _mapper.Map<VehicleDTO>(vehicle);
+                    operationReturn.Success = true;
+                    operationReturn.Data = vehicleDto;
+                    operationReturn.Message = "Veículo retornado com sucesso.";
+                }
             }
             catch (Exception ex)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao retornar veículo: {ex.Message}"
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = $"Erro ao retornar veículo: {ex.Message}";
             }
+
+            return operationReturn;
         }
+
 
         public async Task<OperationReturn> AddVehicle(VehicleDTO vehicleDto)
         {
+            var operationReturn = new OperationReturn();
+
             try
             {
                 var vehicle = _mapper.Map<Vehicle>(vehicleDto);
                 int vehicleAddedId = await _repository.AddVehicle(vehicle);
 
-                var imageOperationResult = new OperationReturn
+                if (vehicleAddedId > 0)
                 {
-                    Success = true,
-                    Message = "Veículo adicionado com sucesso."
-                };
-
-                if (vehicleAddedId > 0 && vehicleDto.VehicleImgs.Count > 0)
-                {
-                    bool allImagesAdded = true;
-
-                    foreach (var vehicleImgDto in vehicleDto.VehicleImgs)
+                    if (vehicleDto.VehicleImgs.Count > 0)
                     {
-                        if (vehicleImgDto.ImageData == null || vehicleImgDto.ImageData.Length == 0)
+                        bool allImagesAdded = true;
+
+                        foreach (var vehicleImgDto in vehicleDto.VehicleImgs)
                         {
-                            continue;
+                            if (vehicleImgDto.ImageData != null && vehicleImgDto.ImageData.Length > 0)
+                            {
+                                vehicleImgDto.VehicleId = vehicleAddedId;
+                                var image = _mapper.Map<VehicleImg>(vehicleImgDto);
+                                bool imageAdded = await _vehicleImgRepository.AddImage(image);
+
+                                if (!imageAdded)
+                                {
+                                    allImagesAdded = false;
+                                }
+                            }
                         }
 
-                        vehicleImgDto.VehicleId = vehicleAddedId;
-                        var image = _mapper.Map<VehicleImg>(vehicleImgDto);
-                        bool imageAdded = await _vehicleImgRepository.AddImage(image);
-
-                        if (!imageAdded)
+                        if (!allImagesAdded)
                         {
-                            allImagesAdded = false;
+                            operationReturn.Message = "Veículo adicionado, mas houve erros ao adicionar algumas imagens.";
+                        }
+                        else
+                        {
+                            operationReturn.Message = "Veículo e imagens adicionados com sucesso.";
                         }
                     }
-
-                    if (!allImagesAdded)
+                    else
                     {
-                        imageOperationResult.Message = "Veículo adicionado, mas houve erros ao adicionar algumas imagens.";
+                        operationReturn.Message = "Veículo adicionado com sucesso, sem imagens.";
                     }
+
+                    operationReturn.Success = vehicleAddedId > 0;
                 }
-
-                return new OperationReturn
+                else
                 {
-                    Success = vehicleAddedId > 0,
-                    Message = imageOperationResult.Message
-                };
+                    operationReturn.Success = false;
+                    operationReturn.Message = "Falha ao adicionar o veículo.";
+                }
             }
             catch (Exception ex)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao adicionar veículo: {ex.Message}"
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = $"Erro ao adicionar veículo: {ex.Message}";
             }
+
+            return operationReturn;
         }
+
 
         public async Task<OperationReturn> UpdateVehicle(VehicleDTO vehicleDto)
         {
+            var operationReturn = new OperationReturn();
+
             if (vehicleDto == null)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = "Veículo inválido."
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = "Veículo inválido.";
+                return operationReturn;
             }
 
             try
@@ -167,122 +168,83 @@ namespace AdSetSolution.Application.Services
                 var vehicle = _mapper.Map<Vehicle>(vehicleDto);
                 bool isVehicleUpdated = await _repository.UpdateVehicle(vehicle);
 
-                var imageOperationResult = new OperationReturn
+                if (isVehicleUpdated)
                 {
-                    Success = true,
-                    Message = "Veículo atualizado com sucesso."
-                };
-
-                if (isVehicleUpdated && vehicleDto.VehicleImgs.Count > 0)
-                {
-                    bool allImagesAdded = true;
-
-                    foreach (var vehicleImgDto in vehicleDto.VehicleImgs)
+                    if (vehicleDto.VehicleImgs.Count > 0)
                     {
-                        if (vehicleImgDto.ImageData == null || vehicleImgDto.ImageData.Length == 0)
+                        bool allImagesAdded = true;
+
+                        foreach (var vehicleImgDto in vehicleDto.VehicleImgs)
                         {
-                            continue;
+                            if (vehicleImgDto.ImageData != null && vehicleImgDto.ImageData.Length > 0)
+                            {
+                                vehicleImgDto.VehicleId = vehicleDto.Id;
+                                var image = _mapper.Map<VehicleImg>(vehicleImgDto);
+                                bool imageAdded = await _vehicleImgRepository.AddImage(image);
+
+                                if (!imageAdded)
+                                {
+                                    allImagesAdded = false;
+                                }
+                            }
                         }
 
-                        vehicleImgDto.VehicleId = vehicleDto.Id;
-                        var image = _mapper.Map<VehicleImg>(vehicleImgDto);
-                        bool imageAdded = await _vehicleImgRepository.AddImage(image);
-
-                        if (!imageAdded)
+                        if (!allImagesAdded)
                         {
-                            allImagesAdded = false;
+                            operationReturn.Message = "Veículo atualizado, mas houve erros ao adicionar algumas imagens.";
+                        }
+                        else
+                        {
+                            operationReturn.Message = "Veículo e imagens atualizados com sucesso.";
                         }
                     }
-
-                    if (!allImagesAdded)
+                    else
                     {
-                        imageOperationResult.Message = "Veículo atualizado, mas houve erros ao adicionar algumas imagens.";
+                        operationReturn.Message = "Veículo atualizado com sucesso, sem imagens.";
                     }
+
+                    operationReturn.Success = true;
                 }
-
-                return new OperationReturn
+                else
                 {
-                    Success = isVehicleUpdated,
-                    Message = imageOperationResult.Message
-                };
+                    operationReturn.Success = false;
+                    operationReturn.Message = "Falha ao atualizar o veículo.";
+                }
             }
             catch (Exception ex)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao atualizar veículo: {ex.Message}"
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = $"Erro ao atualizar veículo: {ex.Message}";
             }
+
+            return operationReturn;
         }
+
 
         public async Task<OperationReturn> DeleteVehicle(int id)
         {
-            if (id <= 0) throw new ArgumentException("ID inválido", nameof(id));
+            var operationReturn = new OperationReturn();
 
             try
             {
+                if (id <= 0)
+                {
+                    throw new ArgumentException("ID inválido", nameof(id));
+                }
+
                 bool isDeleted = await _repository.DeleteVehicle(id);
 
-                return new OperationReturn
-                {
-                    Success = isDeleted,
-                    Message = isDeleted ? "Veículo excluído com sucesso." : "Erro ao excluir veículo."
-                };
+                operationReturn.Success = isDeleted;
+                operationReturn.Message = isDeleted ? "Veículo excluído com sucesso." : "Erro ao excluir veículo.";
             }
             catch (Exception ex)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao excluir veículo: {ex.Message}"
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = $"Erro ao excluir veículo: {ex.Message}";
             }
+
+            return operationReturn;
         }
 
-        private IEnumerable<Vehicle> ApplyFilters(IEnumerable<Vehicle> vehicles, VehicleDTO filter)
-        {
-            if (!string.IsNullOrEmpty(filter.Marca))
-            {
-                vehicles = vehicles.Where(v => v.Marca.Contains(filter.Marca, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (!string.IsNullOrEmpty(filter.Modelo))
-            {
-                vehicles = vehicles.Where(v => v.Modelo.Contains(filter.Modelo, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (filter.Ano > 0)
-            {
-                vehicles = vehicles.Where(v => v.Ano == filter.Ano);
-            }
-
-            if (!string.IsNullOrEmpty(filter.Placa))
-            {
-                vehicles = vehicles.Where(v => v.Placa.Contains(filter.Placa, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (filter.Km > 0)
-            {
-                vehicles = vehicles.Where(v => v.Km == filter.Km);
-            }
-
-            if (!string.IsNullOrEmpty(filter.Cor))
-            {
-                vehicles = vehicles.Where(v => v.Cor.Contains(filter.Cor, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (filter.Preco > 0)
-            {
-                vehicles = vehicles.Where(v => v.Preco == filter.Preco);
-            }
-
-            if (!string.IsNullOrEmpty(filter.Opcionais))
-            {
-                vehicles = vehicles.Where(v => v.Opcionais.Contains(filter.Opcionais, StringComparison.OrdinalIgnoreCase));
-            }
-
-            return vehicles;
-        }
     }
 }

@@ -17,11 +17,15 @@ builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IPackageService, PackageService>();
 builder.Services.AddScoped<IVehicleImgService, VehicleImgService>();
 builder.Services.AddScoped<IVehiclePackageService, VehiclePackageService>();
+builder.Services.AddScoped<IOptionalService, OptionalService>();
+builder.Services.AddScoped<IVehicleOptionalService, VehicleOptionalService>();
 
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 builder.Services.AddScoped<IVehiclePackageRepository, VehiclePackageRepository>();
 builder.Services.AddScoped<IVehicleImgRepository, VehicleImgRepository>();
 builder.Services.AddScoped<IPackageRepository, PackageRepository>();
+builder.Services.AddScoped<IOptionalRepository, OptionalRepository>();
+builder.Services.AddScoped<IVehicleOptionalRepository, VehicleOptionalRepository>();
 
 builder.Services.AddRazorPages();
 

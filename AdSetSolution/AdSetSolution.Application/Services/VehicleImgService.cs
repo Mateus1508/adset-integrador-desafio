@@ -15,33 +15,29 @@ namespace AdSetSolution.Application.Services
 
         public async Task<OperationReturn> DeleteImage(int id)
         {
-            if (id <= 0)
-            {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = "ID inválido."
-                };
-            }
+            var operationReturn = new OperationReturn();
 
             try
             {
+                if (id <= 0)
+                {
+                    operationReturn.Success = false;
+                    operationReturn.Message = "ID inválido.";
+                    return operationReturn;
+                }
+
                 bool isDeleted = await _vehicleImgRepository.DeleteImage(id);
 
-                return new OperationReturn
-                {
-                    Success = isDeleted,
-                    Message = isDeleted ? "Imagem excluída com sucesso." : "Erro ao excluir a imagem."
-                };
+                operationReturn.Success = isDeleted;
+                operationReturn.Message = isDeleted ? "Imagem excluída com sucesso." : "Erro ao excluir a imagem.";
             }
             catch (Exception ex)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao excluir imagem: {ex.Message}"
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = $"Erro ao excluir imagem: {ex.Message}";
             }
+
+            return operationReturn;
         }
     }
 }

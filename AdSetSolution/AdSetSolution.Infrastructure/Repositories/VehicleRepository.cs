@@ -1,9 +1,9 @@
-﻿using AdSetSolution.Application.DTOs;
-using AdSetSolution.Domain.Interfaces;
+﻿using AdSetSolution.Domain.Interfaces;
 using AdSetSolution.Domain.Models;
 using AdSetSolution.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace AdSetSolution.Infrastructure.Repositories
 {
@@ -24,47 +24,51 @@ namespace AdSetSolution.Infrastructure.Repositories
             {
                 var query = _context.Vehicles
                     .Include(v => v.VehicleImgs)
+                    .Include(v => v.VehicleOptional)
                     .AsQueryable();
 
-                if (!string.IsNullOrEmpty(filter.Marca))
-                    query = query.Where(v => v.Marca.Contains(filter.Marca));
+                if (!string.IsNullOrEmpty(filter.Brand))
+                    query = query.Where(v => v.Brand.Contains(filter.Brand));
 
-                if (!string.IsNullOrEmpty(filter.Modelo))
-                    query = query.Where(v => v.Modelo.Contains(filter.Modelo));
+                if (!string.IsNullOrEmpty(filter.Model))
+                    query = query.Where(v => v.Model.Contains(filter.Model));
 
-                if (filter.AnoMin.HasValue)
-                    query = query.Where(v => v.Ano >= filter.AnoMin.Value);
+                if (filter.YearMin.HasValue)
+                    query = query.Where(v => v.Year >= filter.YearMin.Value);
 
-                if (filter.AnoMax.HasValue)
-                    query = query.Where(v => v.Ano <= filter.AnoMax.Value);
+                if (filter.YearMax.HasValue)
+                    query = query.Where(v => v.Year <= filter.YearMax.Value);
 
-                if (!string.IsNullOrEmpty(filter.Placa))
-                    query = query.Where(v => v.Placa.Contains(filter.Placa));
+                if (!string.IsNullOrEmpty(filter.LicensePlate))
+                    query = query.Where(v => v.LicensePlate.Contains(filter.LicensePlate));
 
-                if (!string.IsNullOrEmpty(filter.Cor))
-                    query = query.Where(v => v.Cor.Contains(filter.Cor));
+                if (!string.IsNullOrEmpty(filter.Color))
+                    query = query.Where(v => v.Color.Contains(filter.Color));
 
-                if (!string.IsNullOrEmpty(filter.Preco))
+                if (!string.IsNullOrEmpty(filter.Price))
                 {
-                    var precoRange = filter.Preco;
-                    if (precoRange == "10000-50000")
-                        query = query.Where(v => v.Preco >= 10000 && v.Preco <= 50000);
-                    else if (precoRange == "50000-90000")
-                        query = query.Where(v => v.Preco > 50000 && v.Preco <= 90000);
-                    else if (precoRange == "90000+")
-                        query = query.Where(v => v.Preco > 90000);
+                    var priceRange = filter.Price;
+                    if (priceRange == "10000-50000")
+                        query = query.Where(v => v.Price >= 10000 && v.Price <= 50000);
+                    else if (priceRange == "50000-90000")
+                        query = query.Where(v => v.Price > 50000 && v.Price <= 90000);
+                    else if (priceRange == "90000+")
+                        query = query.Where(v => v.Price > 90000);
                 }
 
-                if(!string.IsNullOrEmpty(filter.Fotos))
+                if (!string.IsNullOrEmpty(filter.Photos))
                 {
-                    if (filter.Fotos == "ComFotos")
+                    if (filter.Photos == "ComFotos")
                         query = query.Where(v => v.VehicleImgs != null && v.VehicleImgs.Any());
-                    else if (filter.Fotos == "SemFotos")
+                    else if (filter.Photos == "SemFotos")
                         query = query.Where(v => v.VehicleImgs == null || !v.VehicleImgs.Any());
                 }
 
-                if (!string.IsNullOrEmpty(filter.Opcionais))
-                    query = query.Where(v => v.Opcionais.Contains(filter.Opcionais));
+                if (filter.VehicleOptionalIds != null && filter.VehicleOptionalIds.Any())
+                {
+                    query = query.Where(v => v.VehicleOptional
+                        .Any(vo => filter.VehicleOptionalIds.Contains(vo.OptionalId)));
+                }
 
                 return await query.ToListAsync();
             }
@@ -115,7 +119,8 @@ namespace AdSetSolution.Infrastructure.Repositories
                 int result = await _context.SaveChangesAsync();
                 return result > 0;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 _logger.LogError(ex, "Erro ao atualizar veículo de Id {Id}.", vehicle.Id);
                 throw;
             }

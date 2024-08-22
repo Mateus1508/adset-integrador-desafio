@@ -4,6 +4,7 @@ using AdSetSolution.Domain.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using AdSetSolution.Domain.Enums;
+using AdSetSolution.Application.Services;
 
 namespace AdSetSolution.WebApplication.Pages
 {
@@ -12,10 +13,12 @@ namespace AdSetSolution.WebApplication.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly IVehicleService _vehicleService;
         private readonly IPackageService _packageService;
+        private readonly IOptionalService _optionalService;
 
         public IEnumerable<VehicleDTO> Vehicles { get; private set; } = Enumerable.Empty<VehicleDTO>();
         public IEnumerable<PackageDTO> ICarros { get; private set; } = Enumerable.Empty<PackageDTO>();
         public IEnumerable<PackageDTO> WebMotors { get; private set; } = Enumerable.Empty<PackageDTO>();
+        public IEnumerable<OptionalDTO> Optional { get; private set; } = Enumerable.Empty<OptionalDTO>();
 
         public int TotalVehicles { get; set; }
         public int VehiclesWithPhotos { get; set; }
@@ -26,17 +29,19 @@ namespace AdSetSolution.WebApplication.Pages
 
         public string AlertMessage { get; set; } = string.Empty;
 
-        public IndexModel(ILogger<IndexModel> logger, IVehicleService vehicleService, IPackageService packageService)
+        public IndexModel(ILogger<IndexModel> logger, IVehicleService vehicleService, IPackageService packageService, IOptionalService optionalService)
         {
             _logger = logger;
             _vehicleService = vehicleService;
             _packageService = packageService;
+            _optionalService = optionalService;
         }
 
         public async Task OnGetAsync()
         {
             await LoadPackagesByPortalTypeAsync();
             await LoadVehiclesAsync();
+            await LoadOptionalAsync();
         }
 
         public async Task<IActionResult> OnPostFilterAsync()
@@ -100,6 +105,28 @@ namespace AdSetSolution.WebApplication.Pages
                 _logger.LogError("Erro ao obter pacotes: {Message}", packageResult.Message);
                 ICarros = Enumerable.Empty<PackageDTO>();
                 WebMotors = Enumerable.Empty<PackageDTO>();
+            }
+        }
+
+        private async Task LoadOptionalAsync()
+        {
+            try
+            {
+                var optionalResult = await _optionalService.GetAllOptional();
+                if (optionalResult.Success)
+                {
+                    Optional = optionalResult.Data as IEnumerable<OptionalDTO> ?? Enumerable.Empty<OptionalDTO>();
+                }
+                else
+                {
+                    _logger.LogError("Erro ao obter opcionais: {Message}", optionalResult.Message);
+                    Optional = Enumerable.Empty<OptionalDTO>();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao carregar opcionais.");
+                Optional = Enumerable.Empty<OptionalDTO>();
             }
         }
     }

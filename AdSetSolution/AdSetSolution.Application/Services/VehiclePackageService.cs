@@ -1,7 +1,6 @@
 ﻿using AdSetSolution.Application.DTOs;
 using AdSetSolution.Application.Interfaces;
 using AdSetSolution.Application.Utils;
-using AdSetSolution.Domain.Enums;
 using AdSetSolution.Domain.Interfaces;
 using AdSetSolution.Domain.Models;
 using AutoMapper;
@@ -23,146 +22,48 @@ namespace AdSetSolution.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<OperationReturn> GetVehiclePackageByVehicleId(int vehicleId)
+        public async Task<OperationReturn> SetVehiclePackages(IEnumerable<VehiclePackageDTO> vehiclePackagesDTO)
         {
-            if (vehicleId <= 0)
-            {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = "ID do veículo inválido."
-                };
-            }
+            var operationReturn = new OperationReturn();
 
             try
             {
-                var vehiclePackage = await _vehiclePackageRepository.GetVehiclePackageByVehicleId(vehicleId);
-                if (vehiclePackage == null)
+                var vehiclePackages = _mapper.Map<IEnumerable<VehiclePackage>>(vehiclePackagesDTO);
+
+                var vehicleId = vehiclePackages.First().VehicleId;
+
+                var existingVehiclePackages = await _vehiclePackageRepository.GetVehiclePackagesByVehicleId(vehicleId);
+
+                var packagesToRemove = existingVehiclePackages
+                    .Where(existing => !vehiclePackages.Any(vp =>
+                        vp.PackageId == existing.PackageId && vp.PortalType == existing.PortalType))
+                    .ToList();
+
+                if (packagesToRemove.Any())
                 {
-                    return new OperationReturn
-                    {
-                        Success = false,
-                        Message = "Pacote de veículo não encontrado."
-                    };
+                    await _vehiclePackageRepository.DeleteVehiclePackage(packagesToRemove);
                 }
 
-                var vehiclePackageDto = _mapper.Map<VehiclePackageDTO>(vehiclePackage);
+                var newPackages = vehiclePackages
+                    .Where(vp => !existingVehiclePackages.Any(existing =>
+                        existing.PackageId == vp.PackageId && existing.PortalType == vp.PortalType))
+                    .ToList();
 
-                return new OperationReturn
+                if (newPackages.Any())
                 {
-                    Success = true,
-                    Data = vehiclePackageDto,
-                    Message = "Pacote de veículo recuperado com sucesso."
-                };
+                    await _vehiclePackageRepository.AddVehiclePackage(newPackages);
+                }
+
+                operationReturn.Success = true;
+                operationReturn.Message = "Pacotes de veículos atualizados com sucesso.";
             }
             catch (Exception ex)
             {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao recuperar pacote de veículo: {ex.Message}"
-                };
+                operationReturn.Success = false;
+                operationReturn.Message = $"Erro ao atualizar pacotes de veículos: {ex.Message}";
             }
-        }
 
-        public async Task<OperationReturn> SetVehiclePackage(VehiclePackageDTO vehiclePackageDto)
-        {
-            if (vehiclePackageDto == null)
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = "Dados do pacote do veículo não podem ser nulos."
-                };
-
-            try
-            {
-                var vehicle = await _vehicleRepository.GetVehicleById(vehiclePackageDto.VehicleId);
-                if (vehicle == null)
-                    return new OperationReturn
-                    {
-                        Success = false,
-                        Message = "Veículo não encontrado."
-                    };
-
-                var existingPackage = await _vehiclePackageRepository.GetVehiclePackageByVehicleIdAndPortalType(vehiclePackageDto.VehicleId, vehiclePackageDto.PortalType);
-                var packageId = vehiclePackageDto.PackageId;  
-
-                if (existingPackage != null)
-                {
-                    if (packageId == null)
-                    {
-                        bool deleteResult = await _vehiclePackageRepository.DeleteVehiclePackage(existingPackage);
-                        if (deleteResult)
-                        {
-                            var incrementResult = await UpdatePackageUsedCountAsync(existingPackage.PackageId, UpdatePackageOperationType.Increment);
-                            if (!incrementResult.Success)
-                                return incrementResult;
-                        }
-
-                        return new OperationReturn
-                        {
-                            Success = deleteResult,
-                            Message = deleteResult ? "Pacote do veículo excluído com sucesso." : "Erro ao excluir o pacote do veículo."
-                        };
-                    }
-
-                    var updatedPackage = _mapper.Map<VehiclePackage>(vehiclePackageDto);
-                    bool updateResult = await _vehiclePackageRepository.UpdateVehiclePackage(updatedPackage);
-                    if (updateResult)
-                    {
-                        var incrementResult = await UpdatePackageUsedCountAsync(existingPackage.PackageId, UpdatePackageOperationType.Increment);
-                        if (!incrementResult.Success)
-                            return incrementResult;
-
-                        var decrementResult = await UpdatePackageUsedCountAsync(packageId.Value, UpdatePackageOperationType.Decrement);
-                        if (!decrementResult.Success)
-                            return decrementResult;
-                    }
-
-                    return new OperationReturn
-                    {
-                        Success = updateResult,
-                        Message = updateResult ? "Pacote do veículo atualizado com sucesso." : "Erro ao atualizar o pacote do veículo."
-                    };
-                }
-
-                var newPackage = _mapper.Map<VehiclePackage>(vehiclePackageDto);
-                bool addResult = await _vehiclePackageRepository.AddVehiclePackage(newPackage);
-                if (addResult)
-                {
-                    var decrementResult = await UpdatePackageUsedCountAsync(newPackage.PackageId, UpdatePackageOperationType.Decrement);
-                    if (!decrementResult.Success)
-                        return decrementResult;
-                }
-
-                return new OperationReturn
-                {
-                    Success = addResult,
-                    Message = addResult ? "Pacote do veículo adicionado com sucesso." : "Erro ao adicionar o pacote do veículo."
-                };
-            }
-            catch (Exception ex)
-            {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao definir o pacote do veículo: {ex.Message}"
-                };
-            }
-        }
-
-        async Task<OperationReturn> UpdatePackageUsedCountAsync(int packageId, UpdatePackageOperationType operation)
-        {
-            bool updateResult = await _packageRepository.UpdatePackage(packageId, operation);
-            if (!updateResult)
-            {
-                return new OperationReturn
-                {
-                    Success = false,
-                    Message = $"Erro ao atualizar o campo 'Used' do pacote ({operation})."
-                };
-            }
-            return new OperationReturn { Success = true };
+            return operationReturn;
         }
     }
 }
