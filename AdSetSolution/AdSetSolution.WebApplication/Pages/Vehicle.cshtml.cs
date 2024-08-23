@@ -1,10 +1,9 @@
 using AdSetSolution.Application.DTOs;
 using AdSetSolution.Application.Interfaces;
-using AdSetSolution.Application.Services;
 using AdSetSolution.Application.Utils;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AdSetSolution.WebApplication.Pages
 {
@@ -13,28 +12,37 @@ namespace AdSetSolution.WebApplication.Pages
         private readonly ILogger<VehicleModel> _logger;
         private readonly IVehicleService _vehicleService;
         private readonly IVehicleImgService _vehicleImgService;
+        private readonly IOptionalService _optionalService;
 
         [BindProperty]
-        public VehicleDTO Vehicle { get; set; }
+        public VehicleDTO Vehicle { get; set; } = new VehicleDTO();
 
         [BindProperty]
         public List<IFormFile> VehicleImgs { get; set; } = new List<IFormFile>();
 
         public bool IsEditing { get; set; }
 
+        public IEnumerable<OptionalDTO> Optional { get; private set; } = Enumerable.Empty<OptionalDTO>();
+        public IEnumerable<SelectListItem> OptionalItems { get; set; } = Enumerable.Empty<SelectListItem>();
+
+        [BindProperty]
+        public IEnumerable<int> OptionalSelectedItems { get; set; } = Enumerable.Empty<int>();
+
         public IEnumerable<VehicleImgDTO> ExistingImages { get; set; } = new List<VehicleImgDTO>();
 
         public string Message { get; set; }
 
-        public VehicleModel(ILogger<VehicleModel> logger, IVehicleService vehicleService, IVehicleImgService vehicleImgService)
+        public VehicleModel(ILogger<VehicleModel> logger, IVehicleService vehicleService, IVehicleImgService vehicleImgService, IOptionalService optionalService)
         {
             _logger = logger;
             _vehicleService = vehicleService;
             _vehicleImgService = vehicleImgService;
+            _optionalService = optionalService;
         }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
+            await LoadOptionalAsync();
             if (id.HasValue)
             {
                 var response = await _vehicleService.GetVehicleById(id.Value);
@@ -43,7 +51,14 @@ namespace AdSetSolution.WebApplication.Pages
                 {
                     Vehicle = (VehicleDTO)response.Data;
                     IsEditing = true;
-                    ExistingImages = Vehicle.VehicleImgs ?? [];
+                    ExistingImages = Vehicle.VehicleImgs ?? new List<VehicleImgDTO>();
+
+                    var selectedOptionIds = Vehicle.OptionalIds?.Select(id => id).ToHashSet() ?? new HashSet<int>();
+
+                    foreach (var item in OptionalItems)
+                    {
+                        item.Selected = selectedOptionIds.Contains(int.Parse(item.Value));
+                    }
                 }
                 else
                 {
@@ -67,36 +82,31 @@ namespace AdSetSolution.WebApplication.Pages
                 return Page();
             }
 
-            var vehicleImgsDto = new List<VehicleImgDTO>();
-            foreach (var formFile in VehicleImgs)
+            if (VehicleImgs.Any())
             {
-                if (formFile.Length > 0)
+                var vehicleImgsDto = new List<VehicleImgDTO>();
+                foreach (var formFile in VehicleImgs)
                 {
-                    using (var memoryStream = new MemoryStream())
+                    if (formFile.Length > 0)
                     {
-                        await formFile.CopyToAsync(memoryStream);
-                        vehicleImgsDto.Add(new VehicleImgDTO
+                        using (var memoryStream = new MemoryStream())
                         {
-                            ImageData = memoryStream.ToArray(),
-                            FileName = formFile.FileName,
-                            ContentType = formFile.ContentType
-                        });
+                            await formFile.CopyToAsync(memoryStream);
+                            vehicleImgsDto.Add(new VehicleImgDTO
+                            {
+                                ImageData = memoryStream.ToArray(),
+                                FileName = formFile.FileName,
+                                ContentType = formFile.ContentType
+                            });
+                        }
                     }
                 }
+                Vehicle.VehicleImgs = vehicleImgsDto;
             }
 
-            Vehicle.VehicleImgs = vehicleImgsDto;
-
-            OperationReturn result;
-
-            if (Vehicle.Id > 0)
-            {
-                result = await _vehicleService.UpdateVehicle(Vehicle);
-            }
-            else
-            {
-                result = await _vehicleService.AddVehicle(Vehicle);
-            }
+            OperationReturn result = Vehicle.Id > 0
+                ? await _vehicleService.UpdateVehicle(Vehicle)
+                : await _vehicleService.AddVehicle(Vehicle);
 
             Message = result.Message;
 
@@ -134,6 +144,33 @@ namespace AdSetSolution.WebApplication.Pages
             {
                 TempData["ErrorMessage"] = "Erro ao remover a imagem.";
                 return RedirectToPage(new { id = vehicleId });
+            }
+        }
+
+        private async Task LoadOptionalAsync()
+        {
+            try
+            {
+                var optionalResult = await _optionalService.GetAllOptional();
+                if (optionalResult.Success)
+                {
+                    Optional = optionalResult.Data as IEnumerable<OptionalDTO> ?? Enumerable.Empty<OptionalDTO>();
+                    OptionalItems = Optional.Select(opt => new SelectListItem
+                    {
+                        Value = opt.Id.ToString(),
+                        Text = opt.Name
+                    }).ToList();
+                }
+                else
+                {
+                    _logger.LogError("Erro ao obter opcionais: {Message}", optionalResult.Message);
+                    Optional = Enumerable.Empty<OptionalDTO>();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao carregar opcionais.");
+                Optional = Enumerable.Empty<OptionalDTO>();
             }
         }
     }

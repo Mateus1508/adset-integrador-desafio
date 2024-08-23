@@ -4,7 +4,8 @@ using AdSetSolution.Domain.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using AdSetSolution.Domain.Enums;
-using AdSetSolution.Application.Services;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AdSetSolution.WebApplication.Pages
 {
@@ -19,13 +20,13 @@ namespace AdSetSolution.WebApplication.Pages
         public IEnumerable<PackageDTO> ICarros { get; private set; } = Enumerable.Empty<PackageDTO>();
         public IEnumerable<PackageDTO> WebMotors { get; private set; } = Enumerable.Empty<PackageDTO>();
         public IEnumerable<OptionalDTO> Optional { get; private set; } = Enumerable.Empty<OptionalDTO>();
+        [BindProperty]
+        public VehicleFilter Filter { get; set; } = new VehicleFilter();
+        public IEnumerable<SelectListItem> OptionalItems { get; set; } = Enumerable.Empty<SelectListItem>();
 
         public int TotalVehicles { get; set; }
         public int VehiclesWithPhotos { get; set; }
         public int VehiclesWithoutPhotos { get; set; }
-
-        [BindProperty]
-        public VehicleFilter Filter { get; set; } = new VehicleFilter();
 
         public string AlertMessage { get; set; } = string.Empty;
 
@@ -47,6 +48,7 @@ namespace AdSetSolution.WebApplication.Pages
         public async Task<IActionResult> OnPostFilterAsync()
         {
             await LoadVehiclesAsync();
+            await LoadOptionalAsync();
             await LoadPackagesByPortalTypeAsync();
             return Page();
         }
@@ -116,6 +118,11 @@ namespace AdSetSolution.WebApplication.Pages
                 if (optionalResult.Success)
                 {
                     Optional = optionalResult.Data as IEnumerable<OptionalDTO> ?? Enumerable.Empty<OptionalDTO>();
+                    OptionalItems = Optional.Select(opt => new SelectListItem
+                    {
+                        Value = opt.Id.ToString(),
+                        Text = opt.Name
+                    }).ToList();
                 }
                 else
                 {

@@ -66,8 +66,8 @@ namespace AdSetSolution.Infrastructure.Repositories
 
                 if (filter.VehicleOptionalIds != null && filter.VehicleOptionalIds.Any())
                 {
-                    query = query.Where(v => v.VehicleOptional
-                        .Any(vo => filter.VehicleOptionalIds.Contains(vo.OptionalId)));
+                    query = query.Where(v => filter.VehicleOptionalIds.All(id =>
+                        v.VehicleOptional.Any(vo => vo.OptionalId == id)));
                 }
 
                 return await query.ToListAsync();
@@ -85,6 +85,8 @@ namespace AdSetSolution.Infrastructure.Repositories
             {
                 return await _context.Vehicles
                     .Include(v => v.VehicleImgs)
+                    .Include(v => v.VehicleOptional)
+                    .ThenInclude(vo => vo.Optional)
                     .FirstOrDefaultAsync(v => v.Id == id);
             }
             catch (Exception ex)

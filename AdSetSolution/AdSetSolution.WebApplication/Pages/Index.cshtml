@@ -93,11 +93,8 @@
                 </div>
                 <div class="filter-input-box">
                     <label for="Optional">Opcionais</label>
-                    <select asp-for="Filter.VehicleOptionalIds" id="Optional" class="filter-select">
-                        @foreach (var optional in Model.Optional)
-                        {
-                            <option value="@optional.Id">@optional.Name</option>
-                        }
+                    <select class="optionalSelect" asp-for="Filter.VehicleOptionalIds" asp-items="@Model.OptionalItems" multiple="multiple" style="width: 200px;">
+                        <option value="0">Todos</option>
                     </select>
                 </div>
             </div>

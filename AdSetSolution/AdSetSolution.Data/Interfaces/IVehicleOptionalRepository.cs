@@ -6,6 +6,6 @@ namespace AdSetSolution.Domain.Interfaces
     {
         Task<List<VehicleOptional>> GetVehicleOptionalsByVehicleId(int vehicleId);
         Task<bool> AddVehicleOptional(IEnumerable<VehicleOptional> vehicleOptional);
-        Task<bool> DeleteVehicleOptional(IEnumerable<VehicleOptional> vehicleOptional);
+        Task<bool> DeleteVehicleOptional(int vehicleId);
     }
 }

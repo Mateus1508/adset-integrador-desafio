@@ -11,12 +11,14 @@ namespace AdSetSolution.Application.Services
     {
         private readonly IVehicleRepository _repository;
         private readonly IVehicleImgRepository _vehicleImgRepository;
+        private readonly IVehicleOptionalService _vehicleOptionalService;
         private readonly IMapper _mapper;
 
-        public VehicleService(IVehicleRepository repository, IVehicleImgRepository vehicleImgRepository, IMapper mapper)
+        public VehicleService(IVehicleRepository repository, IVehicleImgRepository vehicleImgRepository, IVehicleOptionalService vehicleOptionalService, IMapper mapper)
         {
             _repository = repository;
             _vehicleImgRepository = vehicleImgRepository;
+            _vehicleOptionalService = vehicleOptionalService;
             _mapper = mapper;
         }
 
@@ -97,6 +99,7 @@ namespace AdSetSolution.Application.Services
             try
             {
                 var vehicle = _mapper.Map<Vehicle>(vehicleDto);
+
                 int vehicleAddedId = await _repository.AddVehicle(vehicle);
 
                 if (vehicleAddedId > 0)
@@ -134,7 +137,32 @@ namespace AdSetSolution.Application.Services
                         operationReturn.Message = "Veículo adicionado com sucesso, sem imagens.";
                     }
 
-                    operationReturn.Success = vehicleAddedId > 0;
+                    if (vehicleDto.OptionalIds != null && vehicleDto.OptionalIds.Any())
+                    {
+                        var vehicleOptional = vehicleDto.OptionalIds.Select(id => new VehicleOptionalDTO
+                        {
+                            OptionalId = id,
+                            VehicleId = vehicleAddedId
+                        }).ToList();
+
+                        var optionalsOperationReturn = await _vehicleOptionalService.SetVehicleOptional(vehicleOptional);
+
+                        if (optionalsOperationReturn.Success)
+                        {
+                            operationReturn.Message = "Veículo, imagens e opcionais adicionados com sucesso.";
+                            operationReturn.Success = true;
+                        }
+                        else
+                        {
+                            operationReturn.Message = "Veículo adicionado, mas houve erros ao adicionar alguns opcionais.";
+                            operationReturn.Success = false;
+                        }
+                    }
+                    else
+                    {
+                        operationReturn.Message = "Veículo adicionado com sucesso, sem opcionais.";
+                        operationReturn.Success = true;
+                    }
                 }
                 else
                 {
@@ -150,6 +178,7 @@ namespace AdSetSolution.Application.Services
 
             return operationReturn;
         }
+
 
 
         public async Task<OperationReturn> UpdateVehicle(VehicleDTO vehicleDto)
@@ -201,6 +230,33 @@ namespace AdSetSolution.Application.Services
                     else
                     {
                         operationReturn.Message = "Veículo atualizado com sucesso, sem imagens.";
+                    }
+
+                    if (vehicleDto.OptionalIds != null && vehicleDto.OptionalIds.Any())
+                    {
+                        var vehicleOptional = vehicleDto.OptionalIds.Select(id => new VehicleOptionalDTO
+                        {
+                            OptionalId = id,
+                            VehicleId = vehicle.Id,
+                        }).ToList();
+
+                        var optionalsOperationReturn = await _vehicleOptionalService.SetVehicleOptional(vehicleOptional);
+
+                        if (optionalsOperationReturn.Success)
+                        {
+                            operationReturn.Message = "Veículo, imagens e opcionais adicionados com sucesso.";
+                            operationReturn.Success = true;
+                        }
+                        else
+                        {
+                            operationReturn.Message = "Veículo adicionado, mas houve erros ao adicionar alguns opcionais.";
+                            operationReturn.Success = false;
+                        }
+                    }
+                    else
+                    {
+                        operationReturn.Message = "Veículo adicionado com sucesso, sem opcionais.";
+                        operationReturn.Success = true;
                     }
 
                     operationReturn.Success = true;

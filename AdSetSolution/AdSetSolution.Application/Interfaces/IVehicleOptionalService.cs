@@ -10,6 +10,6 @@ namespace AdSetSolution.Application.Interfaces
 {
     public interface IVehicleOptionalService
     {
-       Task<OperationReturn> SetVehicleOptionals(IEnumerable<VehicleOptionalDTO> vehicleOptionalsDTO);
+       Task<OperationReturn> SetVehicleOptional(IEnumerable<VehicleOptionalDTO> vehicleOptionalsDTO);
     }
 }

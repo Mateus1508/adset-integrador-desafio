@@ -1,4 +1,5 @@
 ﻿using AdSetSolution.Domain.Enums;
+using AdSetSolution.Domain.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace AdSetSolution.Application.DTOs
@@ -34,7 +35,7 @@ namespace AdSetSolution.Application.DTOs
         [Range(10000, int.MaxValue, ErrorMessage = "O preço deve ser maior que 10.000.")]
         public int Price { get; set; }
 
-        public ICollection<VehicleOptionalDTO>? VehicleOptionals { get; set; }
+        public ICollection<int>? OptionalIds { get; set; } = new List<int>();
 
         [MaxLength(15, ErrorMessage = "Não é permitido adicionar mais de 15 fotos ao veículo.")]
         public ICollection<VehicleImgDTO>? VehicleImgs { get; set; } = new List<VehicleImgDTO>();

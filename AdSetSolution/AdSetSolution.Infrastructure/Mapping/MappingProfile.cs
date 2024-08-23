@@ -9,6 +9,7 @@ namespace AdSetSolution.Infrastructure.Mapping
         public MappingProfile()
         {
             CreateMap<Vehicle, VehicleDTO>()
+                .ForMember(dest => dest.OptionalIds, opt => opt.MapFrom(src => src.VehicleOptional.Select(vo => vo.OptionalId).ToList()))
                 .ReverseMap();
             CreateMap<VehicleImg, VehicleImgDTO>()
                 .ReverseMap();

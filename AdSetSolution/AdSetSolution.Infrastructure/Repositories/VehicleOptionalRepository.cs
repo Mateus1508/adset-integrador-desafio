@@ -45,14 +45,13 @@ public class VehicleOptionalRepository : IVehicleOptionalRepository
         }
     }
 
-    public async Task<bool> DeleteVehicleOptional(IEnumerable<VehicleOptional> vehicleOptional)
+    public async Task<bool> DeleteVehicleOptional(int vehicleId)
     {
         try
         {
             var existingOptionals = await _context.VehicleOptional
-                .Where(vo => vehicleOptional.Select(vp => new { vp.VehicleId, vp.OptionalId })
-                                             .Contains(new { vo.VehicleId, vo.OptionalId }))
-                .ToListAsync();
+            .Where(vo => vo.VehicleId == vehicleId)
+            .ToListAsync();
 
             if (!existingOptionals.Any())
             {

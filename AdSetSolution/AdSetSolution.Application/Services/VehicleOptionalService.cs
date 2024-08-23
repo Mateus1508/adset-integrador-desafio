@@ -22,37 +22,18 @@ namespace AdSetSolution.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<OperationReturn> SetVehicleOptionals(IEnumerable<VehicleOptionalDTO> vehicleOptionalsDTO)
+        public async Task<OperationReturn> SetVehicleOptional(IEnumerable<VehicleOptionalDTO> vehicleOptionalsDTO)
         {
             var operationReturn = new OperationReturn();
 
             try
             {
                 var vehicleOptionals = _mapper.Map<IEnumerable<VehicleOptional>>(vehicleOptionalsDTO);
-
                 var vehicleId = vehicleOptionals.First().VehicleId;
 
-                var existingVehicleOptionals = await _vehicleOptionalRepository.GetVehicleOptionalsByVehicleId(vehicleId);
+                await _vehicleOptionalRepository.DeleteVehicleOptional(vehicleId);
 
-                var vehicleOptionalsToRemove = existingVehicleOptionals
-                    .Where(existing => !vehicleOptionals.Any(vo =>
-                        vo.OptionalId == existing.OptionalId))
-                    .ToList();
-
-                if (vehicleOptionalsToRemove.Any())
-                {
-                    await _vehicleOptionalRepository.DeleteVehicleOptional(vehicleOptionalsToRemove);
-                }
-
-                var newOptionals = vehicleOptionals
-                    .Where(vo => !existingVehicleOptionals.Any(existing =>
-                        existing.OptionalId == vo.OptionalId))
-                    .ToList();
-
-                if (newOptionals.Any())
-                {
-                    await _vehicleOptionalRepository.AddVehicleOptional(newOptionals);
-                }
+                await _vehicleOptionalRepository.AddVehicleOptional(vehicleOptionals);
 
                 operationReturn.Success = true;
                 operationReturn.Message = "Opcionais de veículos atualizados com sucesso.";
