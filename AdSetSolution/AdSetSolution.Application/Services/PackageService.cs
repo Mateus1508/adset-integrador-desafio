@@ -1,5 +1,4 @@
-﻿using AdSetSolution.Application.DTOs;
-using AdSetSolution.Application.Extensions;
+﻿using AdSetSolution.Application.Extensions;
 using AdSetSolution.Application.Interfaces;
 using AdSetSolution.Application.Utils;
 using AdSetSolution.Domain.Enums;
@@ -91,17 +90,17 @@ namespace AdSetSolution.Application.Services
 
             try
             {
-                var package = await _repository.GetPackageByPortalType(portalType);
-                if (package == null)
+                var packages = await _repository.GetPackageByPortalType(portalType);
+                if (packages == null)
                 {
                     operationReturn.Success = false;
                     operationReturn.Message = $"Pacote do portal {portalType.getPortalName()} não encontrado.";
                     return operationReturn;
                 }
 
-                var packageDto = _mapper.Map<PackageDTO>(package);
+                var packagesDto = _mapper.Map<IEnumerable<PackageDTO>>(packages);
                 operationReturn.Success = true;
-                operationReturn.Data = packageDto;
+                operationReturn.Data = packagesDto;
                 operationReturn.Message = "Pacote retornado com sucesso.";
             }
             catch (Exception ex)

@@ -4,28 +4,18 @@ using System.ComponentModel.DataAnnotations;
 
 public class PackageDTO
 {
-    public int Id { get; }
+    public int Id { get; set; }
 
-    public string Name { get; }
+    public string Name { get; set; }
 
-    public int Total { get; }
+    public int Total { get; set;  }
 
-    public int Used { get; }
+    public int Used { get; set;  }
 
-    public int Available { get; }
+    public int Available { get; set;  }
 
-    public PortalType PortalType { get; }
+    public PortalType PortalType { get; set; }
 
-    public bool IsExhausted { get; }
+    public bool IsExhausted { get; set; }
 
-public PackageDTO(Package package)
-    {
-        Id = package.Id;
-        Name = package.Name;
-        Total = package.Total;
-        Used = package.Used;
-        Available = package.Available;
-        PortalType = package.PortalType;
-        IsExhausted = package.IsExhausted;
-    }
 }

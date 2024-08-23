@@ -44,11 +44,13 @@ namespace AdSetSolution.Infrastructure.Repositories
             }
         }
 
-        public async Task<Package> GetPackageByPortalType(PortalType portalType)
+        public async Task<IEnumerable<Package>> GetPackageByPortalType(PortalType portalType)
         {
             try
             {
-                return await _context.Packages.FirstOrDefaultAsync(p => p.PortalType == portalType);
+                return await _context.Packages
+                                .Where(p => p.PortalType == portalType)
+                                .ToListAsync();
             }
             catch (Exception ex)
             {

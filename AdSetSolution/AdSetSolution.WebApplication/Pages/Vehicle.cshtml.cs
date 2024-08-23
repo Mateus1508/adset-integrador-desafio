@@ -122,11 +122,13 @@ namespace AdSetSolution.WebApplication.Pages
             }
         }
 
-        [HttpPost]
         public async Task<IActionResult> OnPostRemoveImageAsync(int imageId, int vehicleId)
         {
             if (imageId <= 0 || vehicleId <= 0)
-                return BadRequest("ID inválido.");
+            {
+                TempData["ErrorMessage"] = "IDs inválidos.";
+                return RedirectToPage("Error");
+            }
 
             try
             {
@@ -134,14 +136,30 @@ namespace AdSetSolution.WebApplication.Pages
                 if (result.Success)
                 {
                     TempData["SuccessMessage"] = "Imagem removida com sucesso.";
+
+                    var vehicleResponse = await _vehicleService.GetVehicleById(vehicleId);
+                    if (vehicleResponse.Success)
+                    {
+                        Vehicle = (VehicleDTO)vehicleResponse.Data;
+                        ExistingImages = Vehicle.VehicleImgs ?? new List<VehicleImgDTO>();
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "Erro ao carregar o veículo após a exclusão da imagem.";
+                        return RedirectToPage("Error");
+                    }
+
                     return RedirectToPage(new { id = vehicleId });
                 }
-
-                TempData["ErrorMessage"] = "Erro ao remover a imagem.";
-                return RedirectToPage(new { id = vehicleId });
+                else
+                {
+                    TempData["ErrorMessage"] = result.Message ?? "Erro ao remover a imagem.";
+                    return RedirectToPage(new { id = vehicleId });
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Erro ao remover a imagem.");
                 TempData["ErrorMessage"] = "Erro ao remover a imagem.";
                 return RedirectToPage(new { id = vehicleId });
             }

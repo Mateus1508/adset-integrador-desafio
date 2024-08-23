@@ -40,16 +40,16 @@ namespace AdSetSolution.WebApplication.Pages
 
         public async Task OnGetAsync()
         {
-            await LoadPackagesByPortalTypeAsync();
             await LoadVehiclesAsync();
+            await LoadPackagesByPortalTypeAsync();
             await LoadOptionalAsync();
         }
 
         public async Task<IActionResult> OnPostFilterAsync()
         {
             await LoadVehiclesAsync();
-            await LoadOptionalAsync();
             await LoadPackagesByPortalTypeAsync();
+            await LoadOptionalAsync();
             return Page();
         }
 
@@ -94,20 +94,10 @@ namespace AdSetSolution.WebApplication.Pages
 
         private async Task LoadPackagesByPortalTypeAsync()
         {
-            var packageResult = await _packageService.GetAllPackages();
-            if (packageResult.Success && packageResult.Data != null)
-            {
-                var packages = packageResult.Data as IEnumerable<PackageDTO> ?? Enumerable.Empty<PackageDTO>();
-
-                ICarros = packages.Where(p => p.PortalType == PortalType.ICarros).ToList();
-                WebMotors = packages.Where(p => p.PortalType == PortalType.WebMotors).ToList();
-            }
-            else
-            {
-                _logger.LogError("Erro ao obter pacotes: {Message}", packageResult.Message);
-                ICarros = Enumerable.Empty<PackageDTO>();
-                WebMotors = Enumerable.Empty<PackageDTO>();
-            }
+            var iCarrosResult = await _packageService.GetPackageByPortalType(PortalType.ICarros);
+            var webMotorsResult = await _packageService.GetPackageByPortalType(PortalType.WebMotors);
+            ICarros = iCarrosResult.Data as IEnumerable<PackageDTO> ?? Enumerable.Empty<PackageDTO>();
+            WebMotors = webMotorsResult.Data as IEnumerable<PackageDTO> ?? Enumerable.Empty<PackageDTO>();
         }
 
         private async Task LoadOptionalAsync()

@@ -36,7 +36,7 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="Vehicle.LicensePlate">Placa</label>
-                    <input asp-for="Vehicle.LicensePlate" class="form-control" />
+                    <input asp-for="Vehicle.LicensePlate" class="form-control" value="@Model.Vehicle.LicensePlate?.ToUpper()" />
                     <span asp-validation-for="Vehicle.LicensePlate" class="text-danger"></span>
                 </div>
                 <div class="form-group">
@@ -78,26 +78,30 @@
                     <span asp-validation-for="VehicleImgs" class="text-danger"></span>
                 </div>
 
-                <div class="form-group">
-                    <label>Imagens do veículo</label>
-                    <div id="existingImagesContainer">
-                        @foreach (var img in Model.ExistingImages)
-                        {
-                            <div class="existing-image">
-                                <img src="@img.ImageBase64" alt="@img.FileName" style="width: 100px; height: 100px;" />
-                                <form method="post" asp-page-handler="RemoveImage">
-                                    <input type="hidden" name="imageId" value="@img.Id" />
-                                    <input type="hidden" name="vehicleId" value="@Model.Vehicle.Id" />
-                                    <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
-                                </form>
-                            </div>
-                        }
-                    </div>
-                </div>
+               
             </div>
         </div>
     </div>
 </form>
+@if (Model.ExistingImages.Any())
+{
+    <div class="form-group">
+        <label>Imagens do veículo</label>
+        <div id="existingImagesContainer">
+            @foreach (var img in Model.ExistingImages)
+            {
+                <div class="existing-image">
+                    <img src="@img.ImageBase64" alt="@img.FileName" style="width: 100px; height: 100px;" />
+                    <form method="post" asp-page-handler="RemoveImage">
+                        <input type="hidden" name="imageId" value="@img.Id" />
+                        <input type="hidden" name="vehicleId" value="@Model.Vehicle.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+}
 
 @section Scripts {
     <script>
@@ -108,7 +112,6 @@
             const fileInputs = container.querySelectorAll('.image-input');
             const previews = container.querySelectorAll('.img-preview');
 
-            // Remove existing preview if the input is empty
             if (input.files.length === 0) {
                 const index = Array.from(fileInputs).indexOf(input);
                 if (index > 0) {
@@ -117,7 +120,6 @@
                 return;
             }
 
-            // Add a new input if the limit is not reached
             if (fileInputs.length < maxImages) {
                 const newInputGroup = document.createElement('div');
                 newInputGroup.className = 'image-input-group mb-2';
@@ -132,7 +134,7 @@
                 const newPreview = document.createElement('img');
                 newPreview.className = 'img-preview';
                 newPreview.src = '';
-                newPreview.style.display = 'none'; // Hide by default
+                newPreview.style.display = 'none';
 
                 newInputGroup.appendChild(newInput);
                 newInputGroup.appendChild(newPreview);
@@ -140,7 +142,6 @@
                 container.appendChild(newInputGroup);
             }
 
-            // Update the preview for the current input
             updateImagePreview(input);
         }
 
@@ -150,16 +151,15 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     preview.src = e.target.result;
-                    preview.style.display = 'block'; // Show the preview
+                    preview.style.display = 'block';
                 };
                 reader.readAsDataURL(input.files[0]);
             } else {
                 preview.src = '';
-                preview.style.display = 'none'; // Hide if no file selected
+                preview.style.display = 'none';
             }
         }
 
-        // Initialize preview for all existing inputs
         document.querySelectorAll('.image-input').forEach(input => {
             input.addEventListener('change', () => updateImagePreview(input));
         });
@@ -183,7 +183,7 @@
         margin-left: 10px;
         border: 1px solid #ddd;
         border-radius: 4px;
-        display: none; /* Initially hidden */
+        display: none;
     }
 
     .img-thumbnail {

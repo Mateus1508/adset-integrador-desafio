@@ -44,7 +44,7 @@ namespace AdSetSolution.Infrastructure.Repositories
         {
             try
             {
-                var vehicleImg = await _context.VehicleImgs.FindAsync(id);
+                var vehicleImg = await _context.VehicleImgs.AsNoTracking().FirstOrDefaultAsync(img => img.Id == id);
                 if (vehicleImg != null)
                 {
                     _context.VehicleImgs.Remove(vehicleImg);
