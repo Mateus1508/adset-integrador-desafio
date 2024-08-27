@@ -30,28 +30,30 @@ namespace AdSetSolution.Application.Services
             {
                 var vehiclePackages = _mapper.Map<IEnumerable<VehiclePackage>>(vehiclePackagesDTO);
 
-                var vehicleId = vehiclePackages.First().VehicleId;
+                var packagesToAlter = new List<VehiclePackage>();
 
-                var existingVehiclePackages = await _vehiclePackageRepository.GetVehiclePackagesByVehicleId(vehicleId);
-
-                var packagesToRemove = existingVehiclePackages
-                    .Where(existing => !vehiclePackages.Any(vp =>
-                        vp.PackageId == existing.PackageId && vp.PortalType == existing.PortalType))
-                    .ToList();
-
-                if (packagesToRemove.Any())
+                foreach (var package in vehiclePackages)
                 {
-                    await _vehiclePackageRepository.DeleteVehiclePackage(packagesToRemove);
+                    if (package.PackageId > 0 && package.VehicleId > 0)
+                    {
+                        packagesToAlter.Add(package);
+                    }
                 }
 
-                var newPackages = vehiclePackages
-                    .Where(vp => !existingVehiclePackages.Any(existing =>
-                        existing.PackageId == vp.PackageId && existing.PortalType == vp.PortalType))
-                    .ToList();
+                var groupedPackages = packagesToAlter.GroupBy(p => p.VehicleId);
 
-                if (newPackages.Any())
+                foreach (var group in groupedPackages)
                 {
-                    await _vehiclePackageRepository.AddVehiclePackage(newPackages);
+                    var vehicleId = group.Key;
+
+                    var existingVehiclePackages = await _vehiclePackageRepository.GetVehiclePackagesByVehicleId(vehicleId);
+
+                    if (existingVehiclePackages.Any())
+                    {
+                        await _vehiclePackageRepository.DeleteVehiclePackage(existingVehiclePackages);
+                    }
+
+                    await _vehiclePackageRepository.AddVehiclePackage(group.ToList());
                 }
 
                 operationReturn.Success = true;

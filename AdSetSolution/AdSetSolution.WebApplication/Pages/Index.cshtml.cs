@@ -15,42 +15,133 @@ namespace AdSetSolution.WebApplication.Pages
         private readonly IVehicleService _vehicleService;
         private readonly IPackageService _packageService;
         private readonly IOptionalService _optionalService;
+        private readonly IVehiclePackageService _vehiclePackageService;
 
         public IEnumerable<VehicleDTO> Vehicles { get; private set; } = Enumerable.Empty<VehicleDTO>();
         public IEnumerable<PackageDTO> ICarros { get; private set; } = Enumerable.Empty<PackageDTO>();
         public IEnumerable<PackageDTO> WebMotors { get; private set; } = Enumerable.Empty<PackageDTO>();
         public IEnumerable<OptionalDTO> Optional { get; private set; } = Enumerable.Empty<OptionalDTO>();
+
+        public class VehiclePackageFormModel
+        {
+            public int VehicleId { get; set; }
+            public Dictionary<PortalType, int?> Packages { get; set; }
+        }
+
+        [BindProperty]
+        public List<VehiclePackageFormModel> VehiclePackagesForm { get; set; } = new List<VehiclePackageFormModel>();
+
         [BindProperty]
         public VehicleFilter Filter { get; set; } = new VehicleFilter();
+
+        [BindProperty]
+        public int VehicleIdToDeletion { get; set; }
+
         public IEnumerable<SelectListItem> OptionalItems { get; set; } = Enumerable.Empty<SelectListItem>();
 
         public int TotalVehicles { get; set; }
         public int VehiclesWithPhotos { get; set; }
         public int VehiclesWithoutPhotos { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int TotalPages { get; set; }
+        public int PageGroupSize { get; set; } = 10;
+        public int CurrentGroup { get; set; } = 1;
+        public int TotalGroups { get; set; } = 1;
 
         public string AlertMessage { get; set; } = string.Empty;
 
-        public IndexModel(ILogger<IndexModel> logger, IVehicleService vehicleService, IPackageService packageService, IOptionalService optionalService)
+        public IndexModel(
+            ILogger<IndexModel> logger,
+            IVehicleService vehicleService,
+            IPackageService packageService,
+            IOptionalService optionalService,
+            IVehiclePackageService vehiclePackageService
+        )
         {
             _logger = logger;
             _vehicleService = vehicleService;
             _packageService = packageService;
             _optionalService = optionalService;
+            _vehiclePackageService = vehiclePackageService;
         }
 
         public async Task OnGetAsync()
         {
+            if (Request.Query.TryGetValue("page", out var pageValue) && int.TryParse(pageValue, out var page))
+            {
+                PageNumber = page;
+            }
+
+            PageNumber = Math.Max(PageNumber, 1);
+
             await LoadVehiclesAsync();
             await LoadPackagesByPortalTypeAsync();
             await LoadOptionalAsync();
+
+            TotalGroups = (int)Math.Ceiling(TotalPages / (double)PageGroupSize);
+            CurrentGroup = (int)Math.Ceiling(PageNumber / (double)PageGroupSize);
+
+            PageNumber = Math.Min(PageNumber, TotalPages);
         }
 
         public async Task<IActionResult> OnPostFilterAsync()
         {
-            await LoadVehiclesAsync();
-            await LoadPackagesByPortalTypeAsync();
-            await LoadOptionalAsync();
+            await OnGetAsync();
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostUpdateVehiclePackagesAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                await OnGetAsync();
+                return Page();
+            }
+
+            var vehiclePackageDTOs = VehiclePackagesForm
+                .SelectMany(vp => vp.Packages
+                    .Where(pp => pp.Value.HasValue)
+                    .Select(pp => new VehiclePackageDTO
+                    {
+                        VehicleId = vp.VehicleId,
+                        PackageId = pp.Value,
+                        PortalType = pp.Key
+                    }))
+                .ToList();
+
+            var result = await _vehiclePackageService.SetVehiclePackages(vehiclePackageDTOs);
+
+            if (result.Success)
+            {
+                TempData["SuccessMessage"] = "Pacotes de veículos atualizados com sucesso.";
+                await OnGetAsync();
+                return Page();
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, result.Message);
+                await OnGetAsync();
+                return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnPostDeleteVehicleAsync()
+        {
+                var result = await _vehicleService.DeleteVehicle(VehicleIdToDeletion);
+
+                if (result.Success)
+                {
+                    TempData["SuccessMessage"] = "Pacote de veículo excluído com sucesso.";
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, result.Message);
+                }
+            
+
+            await OnGetAsync();
+            return Page();
+
         }
 
         private async Task LoadVehiclesAsync()
@@ -63,9 +154,17 @@ namespace AdSetSolution.WebApplication.Pages
                     var vehicles = vehicleResult.Data as IEnumerable<VehicleDTO>;
                     if (vehicles != null && vehicles.Any())
                     {
-                        Vehicles = vehicles;
+                        TotalVehicles = vehicles.Count();
+
+                        TotalPages = (int)Math.Ceiling(TotalVehicles / 1.0);
+
+                        PageNumber = Math.Min(PageNumber, TotalPages);
+
+                        Vehicles = vehicles
+                            .Skip((PageNumber - 1) * 1)
+                            .Take(1);
+
                         var vehiclesList = Vehicles.ToList();
-                        TotalVehicles = vehiclesList.Count;
                         VehiclesWithPhotos = vehiclesList.Count(v => v.VehicleImgs != null && v.VehicleImgs.Any());
                         VehiclesWithoutPhotos = TotalVehicles - VehiclesWithPhotos;
 

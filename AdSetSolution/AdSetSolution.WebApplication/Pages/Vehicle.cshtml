@@ -4,123 +4,150 @@
     ViewData["Title"] = Model.IsEditing ? "Editar Veículo" : "Adicionar Veículo";
 }
 
-<h2>@ViewData["Title"]</h2>
-
 @if (!string.IsNullOrEmpty(Model.Message))
 {
-    <div class="alert alert-info">
+    <div class="alert alert-info mt-2 mx-auto position-absolute alert-container">
         @Model.Message
     </div>
 }
 
-<form method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="Vehicle.Id" class="form-control" />
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="Vehicle.Brand">Marca</label>
-                    <input asp-for="Vehicle.Brand" class="form-control" />
-                    <span asp-validation-for="Vehicle.Brand" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Vehicle.Model">Modelo</label>
-                    <input asp-for="Vehicle.Model" class="form-control" />
-                    <span asp-validation-for="Vehicle.Model" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Vehicle.Year">Ano</label>
-                    <input asp-for="Vehicle.Year" class="form-control" />
-                    <span asp-validation-for="Vehicle.Year" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Vehicle.LicensePlate">Placa</label>
-                    <input asp-for="Vehicle.LicensePlate" class="form-control" value="@Model.Vehicle.LicensePlate?.ToUpper()" />
-                    <span asp-validation-for="Vehicle.LicensePlate" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Vehicle.Mileage">Km</label>
-                    <input asp-for="Vehicle.Mileage" class="form-control" />
-                    <span asp-validation-for="Vehicle.Mileage" class="text-danger"></span>
-                </div>
-                <div class="form-group mt-2">
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                    <button type="button" onclick="window.location.href='/'" class="btn btn-danger">Cancelar</button>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="Vehicle.Color">Cor</label>
-                    <input asp-for="Vehicle.Color" class="form-control" />
-                    <span asp-validation-for="Vehicle.Color" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Vehicle.Price">Preço</label>
-                    <input asp-for="Vehicle.Price" class="form-control" />
-                    <span asp-validation-for="Vehicle.Price" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Vehicle.OptionalIds">Opcionais</label>
-                    <select class="optionalSelect" asp-for="Vehicle.OptionalIds" asp-items="@Model.OptionalItems" multiple="multiple" style="width: 100%;">
-                        <option value="0">Todos</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Imagens</label>
-                    <div id="image-inputs-container">
-                        <div class="image-input-group mb-2">
-                            <input type="file" name="VehicleImgs" class="form-control image-input" accept="image/*" onchange="handleFileChange(this)" />
-                            <img class="img-preview" src="" alt="Pré-visualização da Imagem" style="display: none;" />
-                        </div>
-                    </div>
-                    <span asp-validation-for="VehicleImgs" class="text-danger"></span>
-                </div>
-
-               
-            </div>
-        </div>
-    </div>
-</form>
-@if (Model.ExistingImages.Any())
+@if (!ModelState.IsValid)
 {
-    <div class="form-group">
-        <label>Imagens do veículo</label>
-        <div id="existingImagesContainer">
-            @foreach (var img in Model.ExistingImages)
-            {
-                <div class="existing-image">
-                    <img src="@img.ImageBase64" alt="@img.FileName" style="width: 100px; height: 100px;" />
-                    <form method="post" asp-page-handler="RemoveImage">
-                        <input type="hidden" name="imageId" value="@img.Id" />
-                        <input type="hidden" name="vehicleId" value="@Model.Vehicle.Id" />
-                        <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
-                    </form>
-                </div>
-            }
-        </div>
+    <div class="alert alert-danger mt-2 position-absolute alert-container">
+        @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
     </div>
 }
 
+<div class="d-flex flex-column align-items-center mt-4">
+    <h1 class="text-center mb-2">@ViewData["Title"]</h1>
+    <form method="post" class="w-100 flex justify-content-center" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Vehicle.Id" class="form-control" />
+
+            <div class="d-flex justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="Vehicle.Brand">Marca</label>
+                        <input asp-for="Vehicle.Brand" class="form-control" />
+                        <span asp-validation-for="Vehicle.Brand" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Vehicle.Model">Modelo</label>
+                        <input asp-for="Vehicle.Model" class="form-control" />
+                        <span asp-validation-for="Vehicle.Model" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Vehicle.Year">Ano</label>
+                        <input asp-for="Vehicle.Year" class="form-control" />
+                        <span asp-validation-for="Vehicle.Year" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Vehicle.LicensePlate">Placa</label>
+                        <input asp-for="Vehicle.LicensePlate" class="form-control" value="@Model.Vehicle.LicensePlate?.ToUpper()" />
+                        <span asp-validation-for="Vehicle.LicensePlate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Vehicle.Mileage">Km</label>
+                        <input asp-for="Vehicle.Mileage" class="form-control" />
+                        <span asp-validation-for="Vehicle.Mileage" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Vehicle.Color">Cor</label>
+                        <select asp-for="Vehicle.Color" id="Color" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="Branco">Branco</option>
+                            <option value="Cinza">Cinza</option>
+                            <option value="Preto">Preto</option>
+                            <option value="Vermelho">Vermelho</option>
+                        </select>
+                        <span asp-validation-for="Vehicle.Color" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Vehicle.Price">Preço</label>
+                        <input asp-for="Vehicle.Price" class="form-control" />
+                        <span asp-validation-for="Vehicle.Price" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Vehicle.OptionalIds">Opcionais</label>
+                        <select class="optionalSelect form-control" asp-for="Vehicle.OptionalIds" asp-items="@Model.OptionalItems" multiple="multiple">
+                            <option value="0">Nenhum</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Imagens a serem adicionadas</label>
+                        <div id="image-inputs-container">
+                            <div class="image-input-group mb-2">
+                                <input type="file" name="VehicleImgs" class="form-control image-input" accept="image/*" onchange="handleFileChange(this)" />
+                                <img class="img-preview" src="" alt="Pré-visualização da Imagem" style="display: none;" />
+                            </div>
+                        </div>
+                        <span asp-validation-for="VehicleImgs" class="text-danger"></span>
+                        <p id="image-limit-message" class="text-danger"></p>
+                    </div>
+                    <div class="form-group mt-2 d-flex justify-content-left gap-2">
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <button type="button" onclick="window.location.href='/'" class="btn btn-danger">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+    </form>
+
+    @if (Model.ExistingImages.Any())
+    {
+        <div class="form-group mt-4">
+            <label>Imagens do veículo</label>
+            <div id="existingImagesContainer" class="d-flex justify-content-center flex-wrap gap-2">
+                @foreach (var img in Model.ExistingImages)
+                {
+                    <div class="existing-image text-center">
+                        <img src="@img.ImageBase64" alt="@img.FileName" class="img-thumbnail" />
+                        <form method="post" asp-page-handler="RemoveImage" class="mt-2">
+                            <input type="hidden" name="imageId" value="@img.Id" />
+                            <input type="hidden" name="vehicleId" value="@Model.Vehicle.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+
 @section Scripts {
     <script>
-        const maxImages = 15;
+        const totalAllowedImages = 15;
+        const imageInputSelector = '.image-input';
+        const imageInput = document.querySelector(imageInputSelector);
+        const existingImagesCount = @Model.ExistingImages.Count();
+
+        function calculateMaxImages() {
+            const currentImageInputs = document.querySelectorAll(imageInputSelector).length;
+            const totalCurrentImages = existingImagesCount + currentImageInputs - 1;
+            let maxImages = totalAllowedImages - totalCurrentImages;
+
+            updateImageLimitMessage(maxImages);
+            toggleImageInput(maxImages);
+        }
 
         function handleFileChange(input) {
             const container = document.getElementById('image-inputs-container');
-            const fileInputs = container.querySelectorAll('.image-input');
-            const previews = container.querySelectorAll('.img-preview');
+            const fileInputs = container.querySelectorAll(imageInputSelector);
 
             if (input.files.length === 0) {
                 const index = Array.from(fileInputs).indexOf(input);
-                if (index > 0) {
+                if (index > -1) {
                     container.removeChild(container.children[index]);
                 }
+                calculateMaxImages();
                 return;
             }
 
-            if (fileInputs.length < maxImages) {
+            const totalCurrentInputs = fileInputs.length;
+
+            if (totalCurrentInputs < totalAllowedImages && totalCurrentInputs < existingImagesCount + maxImages) {
                 const newInputGroup = document.createElement('div');
                 newInputGroup.className = 'image-input-group mb-2';
 
@@ -129,17 +156,15 @@
                 newInput.name = 'VehicleImgs';
                 newInput.className = 'form-control image-input';
                 newInput.accept = 'image/*';
-                newInput.onchange = (e) => handleFileChange(e.target);
+                newInput.onchange = () => handleFileChange(newInput);
 
                 const newPreview = document.createElement('img');
                 newPreview.className = 'img-preview';
-                newPreview.src = '';
                 newPreview.style.display = 'none';
 
-                newInputGroup.appendChild(newInput);
-                newInputGroup.appendChild(newPreview);
-
+                newInputGroup.append(newInput, newPreview);
                 container.appendChild(newInputGroup);
+                calculateMaxImages();
             }
 
             updateImagePreview(input);
@@ -160,35 +185,24 @@
             }
         }
 
-        document.querySelectorAll('.image-input').forEach(input => {
+        function updateImageLimitMessage(maxImages) {
+            const messageElement = document.getElementById('image-limit-message');
+            if (maxImages <= 0) {
+                messageElement.textContent = `Você atingiu o limite máximo de imagens (${totalAllowedImages}).`;
+            } else {
+                messageElement.textContent = `Você pode adicionar no máximo ${maxImages} imagens.`;
+            }
+            messageElement.style.display = 'block';
+        }
+
+        function toggleImageInput(maxImages) {
+            imageInput.disabled = maxImages <= 0;
+        }
+
+        document.querySelectorAll(imageInputSelector).forEach(input => {
             input.addEventListener('change', () => updateImagePreview(input));
         });
+
+        calculateMaxImages();
     </script>
 }
-
-<style>
-    .image-input-group {
-        display: flex;
-        align-items: center;
-    }
-
-    .image-input {
-        flex: 1;
-    }
-
-    .img-preview {
-        width: 100px;
-        height: 100px;
-        object-fit: cover;
-        margin-left: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        display: none;
-    }
-
-    .img-thumbnail {
-        max-width: 100px;
-        max-height: 100px;
-        object-fit: cover;
-    }
-</style>

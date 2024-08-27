@@ -42,36 +42,7 @@ namespace AdSetSolution.WebApplication.Pages
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            await LoadOptionalAsync();
-            if (id.HasValue)
-            {
-                var response = await _vehicleService.GetVehicleById(id.Value);
-
-                if (response.Success)
-                {
-                    Vehicle = (VehicleDTO)response.Data;
-                    IsEditing = true;
-                    ExistingImages = Vehicle.VehicleImgs ?? new List<VehicleImgDTO>();
-
-                    var selectedOptionIds = Vehicle.OptionalIds?.Select(id => id).ToHashSet() ?? new HashSet<int>();
-
-                    foreach (var item in OptionalItems)
-                    {
-                        item.Selected = selectedOptionIds.Contains(int.Parse(item.Value));
-                    }
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = response.Message ?? "Erro ao carregar veículo.";
-                    return RedirectToPage("Error");
-                }
-            }
-            else
-            {
-                Vehicle = new VehicleDTO();
-                IsEditing = false;
-            }
-
+            await LoadDataAsync(id);
             return Page();
         }
 
@@ -79,6 +50,7 @@ namespace AdSetSolution.WebApplication.Pages
         {
             if (!ModelState.IsValid)
             {
+                await LoadDataAsync(Vehicle.Id);
                 return Page();
             }
 
@@ -162,6 +134,37 @@ namespace AdSetSolution.WebApplication.Pages
                 _logger.LogError(ex, "Erro ao remover a imagem.");
                 TempData["ErrorMessage"] = "Erro ao remover a imagem.";
                 return RedirectToPage(new { id = vehicleId });
+            }
+        }
+
+        private async Task LoadDataAsync(int? vehicleId)
+        {
+            await LoadOptionalAsync();
+
+            if (vehicleId.HasValue && vehicleId.Value > 0)
+            {
+                var response = await _vehicleService.GetVehicleById(vehicleId.Value);
+                if (response.Success)
+                {
+                    Vehicle = (VehicleDTO)response.Data;
+                    ExistingImages = Vehicle.VehicleImgs ?? new List<VehicleImgDTO>();
+
+                    var selectedOptionIds = Vehicle.OptionalIds?.ToHashSet() ?? new HashSet<int>();
+                    foreach (var item in OptionalItems)
+                    {
+                        item.Selected = selectedOptionIds.Contains(int.Parse(item.Value));
+                    }
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = response.Message ?? "Erro ao carregar veículo.";
+                    RedirectToPage("Error");
+                }
+            }
+            else
+            {
+                Vehicle = new VehicleDTO();
+                ExistingImages = new List<VehicleImgDTO>();
             }
         }
 

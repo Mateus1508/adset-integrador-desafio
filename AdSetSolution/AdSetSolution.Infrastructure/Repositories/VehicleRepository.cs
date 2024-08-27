@@ -24,6 +24,7 @@ namespace AdSetSolution.Infrastructure.Repositories
             {
                 var query = _context.Vehicles
                     .Include(v => v.VehicleImgs)
+                    .Include(v => v.VehiclePackages)
                     .Include(v => v.VehicleOptional)
                     .AsQueryable();
 

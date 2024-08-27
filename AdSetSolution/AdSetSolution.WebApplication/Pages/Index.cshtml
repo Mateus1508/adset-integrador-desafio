@@ -19,234 +19,299 @@
         <img src="/images/adset-integrador.png" style="width: 100px; height: auto;" />
     </div>
     <div class="main-content">
-        <section class="info-box">
-            <div class="info-item">
-                <h2>@Model.TotalVehicles.ToString("D3") Veículos</h2>
-                <h3 style="color:#00b4d8">Total</h3>
-            </div>
-            <div class="info-item border-curve">
-                <h2>@Model.VehiclesWithPhotos.ToString("D3") Veículos</h2>
-                <h3 style="color:#76c893">Com fotos</h3>
-            </div>
-            <div class="info-item">
-                <h2>@Model.VehiclesWithoutPhotos.ToString("D3") Veículos</h2>
-                <h3 style="color:#ec5766">Sem fotos</h3>
-            </div>
-            <div class="info-item pipe">
-                <h2 class="export-csv-item">
-                    Exportar estoque
-                    <img src="/images/export-csv-icon.png" style="width: 50px;" />
-                </h2>
-            </div>
-            <div class="buttons">
-                <a asp-page="/Vehicle" class="">
-                <img src="~/images/register-vehicle-icon.png" style="width: 80px;" />
-                </a>
-                <button class="btn-save">
-                    <span class="save-btn-img">
-                        <img src="~/images/save-icon.png" style="width: 50px; height: 50px;" />
-                    </span>
-                    <span class="save-btn-name">Salvar</span>
-                </button>
-            </div>
-        </section>
-        <section>
-            <form method="post" class="search-params" onsubmit="return validateYears()">
-                <div class="input-box">
-                    <div class="filter-input-box">
-                        <label asp-for="Filter.LicensePlate">Placa</label>
-                        <input asp-for="Filter.LicensePlate" class="filter-input" style="width: 150px;" />
-                    </div>
-                    <div class="filter-input-box">
-                        <label asp-for="Filter.Brand">Marca</label>
-                        <input asp-for="Filter.Brand" class="filter-input" style="width: 150px;" />
-                    </div>
-                    <div class="filter-input-box">
-                        <label asp-for="Filter.Model">Modelo</label>
-                        <input asp-for="Filter.Model" class="filter-input" style="width: 200px;" />
-                    </div>
-                    <div class="filter-input-box">
-                        <label for="YearMin">Ano Min</label>
-                        <select asp-for="Filter.YearMin" id="YearMin" class="filter-select">
-                            <option value="">Todos</option>
-                            @for (int i = 2000; i <= 2024; i++)
-                            {
-                                <option value="@i">@i</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="filter-input-box">
-                        <label for="YearMax">Ano Max</label>
-                        <select asp-for="Filter.YearMax" id="YearMax" class="filter-select">
-                            <option value="">Todos</option>
-                            @for (int i = 2000; i <= 2024; i++)
-                            {
-                                <option value="@i">@i</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="filter-input-box">
-                        <label for="Photos">Fotos</label>
-                        <select asp-for="Filter.Photos" id="Photos" class="filter-select">
-                            <option value="">Todos</option>
-                            <option value="WithPhotos">Com fotos</option>
-                            <option value="WithoutPhotos">Sem fotos</option>
-                        </select>
-                    </div>
-                    <div class="filter-input-box">
-                        <label for="Color">Cor</label>
-                        <select asp-for="Filter.Color" id="Color" class="filter-select">
-                            <option value="">Todos</option>
-                            <option value="White">Branco</option>
-                            <option value="Gray">Cinza</option>
-                            <option value="Black">Preto</option>
-                            <option value="Red">Vermelho</option>
-                        </select>
-                    </div>
-                    <div class="filter-input-box">
-                        <label for="Price">Preço</label>
-                        <select asp-for="Filter.Price" id="Price" class="filter-select">
-                            <option value="">Todos</option>
-                            <option value="10000-50000">10mil a 50mil</option>
-                            <option value="50000-90000">50mil a 90mil</option>
-                            <option value="90000+">+90mil</option>
-                        </select>
-                    </div>
-                    <div class="filter-input-box">
-                        <label for="Optional">Opcionais</label>
-                        <select class="optionalSelect" asp-for="Filter.VehicleOptionalIds" asp-items="@Model.OptionalItems" multiple="multiple" style="width: 200px;">
-                            <option value="0">Todos</option>
-                        </select>
-                    </div>
-                    <i class="fa-solid fa-eraser" style="color: red;"></i>
+        <span class="margin-left"></span>
+        <div>
+            <section class="info-box">
+                <div class="info-item">
+                    <h2>@Model.TotalVehicles.ToString("D3") Veículos</h2>
+                    <h3 style="color:#00b4d8">Total</h3>
                 </div>
-
-                <div class="filter-input-box">
-                    <button type="submit" class="search-button" style="background: #55a630;" asp-page-handler="Filter">
-                        <i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i> 
-                        Buscar
+                <div class="info-item border-curve">
+                    <h2>@Model.VehiclesWithPhotos.ToString("D3") Veículos</h2>
+                    <h3 style="color:#76c893">Com fotos</h3>
+                </div>
+                <div class="info-item">
+                    <h2>@Model.VehiclesWithoutPhotos.ToString("D3") Veículos</h2>
+                    <h3 style="color:#ec5766">Sem fotos</h3>
+                </div>
+                <div class="info-item pipe">
+                    <h2 class="export-csv-item">
+                        Exportar estoque
+                        <img src="/images/export-csv-icon.png" style="width: 50px;" />
+                    </h2>
+                </div>
+                <div class="buttons">
+                    <a asp-page="/Vehicle" class="">
+                        <img src="~/images/register-vehicle-icon.png" style="width: 80px;" />
+                    </a>
+                    <button id="submitVehiclePackageButton" class="btn-save">
+                        <span class="save-btn-img">
+                            <img src="~/images/save-icon.png" style="width: 50px; height: 50px;" />
+                        </span>
+                        <p class="save-btn-name">Salvar</p>
                     </button>
                 </div>
-            </form>
-        </section>
-        <section class="registers">
-            <div class="vehicles">
-                <div class="table-header">
-                    <div class="table-header-content">
-                        <div class="sorteable-table">
-                            <span class="clean-filter-sorteable">
-                                <i class="fa-solid fa-eraser" style="color: red;"></i>
-                            </span>
-                            <h3 class="sorteable-item">Marca / Modelo</h3>
-                            <h3 class="sorteable-item pipe">Ano</h3>
-                            <h3 class="sorteable-item">Preço</h3>
-                            <h3 class="sorteable-item pipe">Fotos</h3>
+            </section>
+            <section>
+                <form asp-page-handler="Filter" method="post" class="search-params" onsubmit="return validateYears()">
+                    <div class="input-box">
+                        <div class="filter-input-box">
+                            <label asp-for="Filter.LicensePlate">Placa</label>
+                            <input asp-for="Filter.LicensePlate" class="filter-input" style="width: 150px;" />
                         </div>
-                        <div class="package-img-box">
-                            <div class="package-img">
-                                <img src="/images/icarros-logo.png" style="width: 40px; height: 40px;" />
+                        <div class="filter-input-box">
+                            <label asp-for="Filter.Brand">Marca</label>
+                            <input asp-for="Filter.Brand" class="filter-input" style="width: 150px;" />
+                        </div>
+                        <div class="filter-input-box">
+                            <label asp-for="Filter.Model">Modelo</label>
+                            <input asp-for="Filter.Model" class="filter-input" style="width: 200px;" />
+                        </div>
+                        <div class="filter-input-box">
+                            <label for="YearMin">Ano Min</label>
+                            <select asp-for="Filter.YearMin" id="YearMin" class="filter-select">
+                                <option value="">Todos</option>
+                                @for (int i = 2000; i <= 2024; i++)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="filter-input-box">
+                            <label for="YearMax">Ano Max</label>
+                            <select asp-for="Filter.YearMax" id="YearMax" class="filter-select">
+                                <option value="">Todos</option>
+                                @for (int i = 2000; i <= 2024; i++)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="filter-input-box">
+                            <label for="Photos">Fotos</label>
+                            <select asp-for="Filter.Photos" id="Photos" class="filter-select">
+                                <option value="">Todos</option>
+                                <option value="WithPhotos">Com fotos</option>
+                                <option value="WithoutPhotos">Sem fotos</option>
+                            </select>
+                        </div>
+                        <div class="filter-input-box">
+                            <label for="Color">Cor</label>
+                            <select asp-for="Filter.Color" id="Color" class="filter-select">
+                                <option value="">Todos</option>
+                                <option value="Branco">Branco</option>
+                                <option value="Cinza">Cinza</option>
+                                <option value="Preto">Preto</option>
+                                <option value="Vermelho">Vermelho</option>
+                            </select>
+                        </div>
+                        <div class="filter-input-box">
+                            <label for="Price">Preço</label>
+                            <select asp-for="Filter.Price" id="Price" class="filter-select">
+                                <option value="">Todos</option>
+                                <option value="10000-50000">10mil a 50mil</option>
+                                <option value="50000-90000">50mil a 90mil</option>
+                                <option value="90000+">+90mil</option>
+                            </select>
+                        </div>
+                        <div class="filter-input-box">
+                            <label for="Optional">Opcionais</label>
+                            <select class="filter-select" name="Filter.VehicleOptionalIds" style="width: 200px;">
+                                <option value="">Todos</option>
+                                @foreach (var optional in Model.OptionalItems)
+                                {
+                                    <option value="@optional.Value">@optional.Text</option>
+                                }
+                            </select>
+                        </div>
+                            <i class="fa-solid fa-eraser" style="color: red;"></i>
+                    </div>
+
+                    <div class="filter-input-box">
+                        <button type="submit" class="search-button" style="background: #55a630;" asp-page-handler="Filter">
+                            <i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i>
+                            Buscar
+                        </button>
+                    </div>
+                </form>
+            </section>
+            <section class="registers">
+                <div class="vehicles">
+                    <div class="table-header">
+                        <div class="table-header-content">
+                            <div class="sorteable-table">
+                                <span class="clean-filter-sorteable">
+                                    <span class="clean-icon-sorteable">
+                                    </span>
+                                    <i class="fa-solid fa-eraser fa-sm sorteable" style="color: red;"></i>
+                                </span>
+                                <div class="sorteable-item"><p>Marca / Modelo</p> <span class="sorteable-item-icon"></span></div>
+                                <div class="sorteable-item pipe"><p>Ano</p> <span class="sorteable-item-icon"></span></div>
+                                <div class="sorteable-item"><p>Preço</p> <span class="sorteable-item-icon"></span></div>
+                                <div class="sorteable-item pipe"><p>Fotos</p> <span class="sorteable-item-icon"></span></div>
                             </div>
-                            <div class="package-img">
-                                <img src="/images/webmotors-logo.png" style="width: 50px; height: 50px;" />
+                            <div class="package-img-box">
+                                <div class="package-img">
+                                    <img src="/images/icarros-logo.png" style="width: 40px; height: 40px;" />
+                                    <div class="package-actions">
+                                        <i class="fa-solid fa-arrow-down" style="color: green"></i>
+                                        <i class="fa-solid fa-eraser" style="color: red"></i>
+                                    </div>
+                                </div>
+                                <div class="package-img">
+                                    <img src="/images/webmotors-logo.png" style="width: 50px; height: 50px;" />
+                                    <div class="package-actions">
+                                        <i class="fa-solid fa-arrow-down" style="color: green"></i>
+                                        <i class="fa-solid fa-eraser" style="color: red"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                @if (Model.Vehicles != null && Model.Vehicles.Any())
-                {
-                    @foreach (var vehicle in Model.Vehicles)
-                    {
-                        <div class="vehicle">
-                            <div class="vehicle-item">
-                                <button type="button" class="btn-delete-vehicle">
-                                    <i class="fa-solid fa-trash-can" style="color: red;"></i>
-                                </button>
-                                <div class="vehicle-image-box">
-                                    @if (vehicle.VehicleImgs != null && vehicle.VehicleImgs.Any())
-                                    {
-                                        var firstImage = vehicle.VehicleImgs.First();
-                                        <img src="@firstImage.ImageBase64" alt="@vehicle.Model" class="vehicle-image-item" />
-                                    }
-                                    else
-                                    {
-                                        <img src="" alt="Sem imagem" class="vehicle-image-item" />
-                                    }
-                                </div>
-                                <div class="vehicle-content">
-                                    <div class="vehicle-info">
-                                        <h3 class="vehicle-model">@vehicle.Brand.ToUpper() @vehicle.Model.ToUpper() | @vehicle.Year</h3>
-                                        <p>Placa - <span style="color: green">@FormatLicensePlate(vehicle.LicensePlate)</span></p>
-                                        <p>Km - <span style="color: green">@(vehicle.Mileage.HasValue ? vehicle.Mileage.Value.ToString("N0") : "Não informado")</span></p>
-                                        <p>Cor - <span style="color: green">@vehicle.Color</span></p>
-                                    </div>
-                                    <div class="vehicle-actions-box">
-                                        <div class="vehicle-actions">
-                                            <a asp-page="/Vehicle" asp-route-id="@vehicle.Id" class="btn-edit">
-                                                <i class="fa-solid fa-pen-to-square" style="color: #ffffff"></i>
-                                            </a>
-                                            <p class="column">
-                                                <i class="fa-solid fa-camera" style="color: grey"></i>
-                                                <span style="color: green; font-size: 12px;">@(vehicle.VehicleImgs != null ? vehicle.VehicleImgs.Count().ToString("D2") : "00")</span>
-                                            </p>
-                                            <p class="column">
-                                                <i class="fa-solid fa-car" style="color: grey;"></i>
-                                                <span style="color: green; font-size: 12px;">@(vehicle.OptionalIds == null || !vehicle.OptionalIds.Any() ? "Sem opcionais" : "Opcionais")</span>
-                                            </p>
-                                        </div>
-                                        <p class="vehicle-price" style="color: green">R$ @vehicle.Price.ToString("N2")</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="packages">
-                                @if ((Model.ICarros?.Any() == true) || (Model.WebMotors?.Any() == true))
-                                {
-                                    <div class="portal-container">
-                                        @foreach (var portal in new[] { new { Name = "ICarros", Packages = Model.ICarros }, new { Name = "WebMotors", Packages = Model.WebMotors } })
-                                        {
-                                            if (portal.Packages?.Any() == true)
+                    <form asp-page-handler="UpdateVehiclePackages" id="VehiclePackageForm" method="post">
+                        @if (Model.Vehicles != null && Model.Vehicles.Any())
+                        {
+                            @foreach (var vehicle in Model.Vehicles.Select((v, i) => new { Vehicle = v, Index = i }))
+                            {
+                                <div class="vehicle">
+                                    <div class="vehicle-item">
+                                        <button type="button" class="btn-delete-vehicle" onclick="deleteVehicle(@vehicle.Vehicle.Id)">
+                                            <i class="fa-solid fa-trash-can" style="color: red;"></i>
+                                        </button>
+                                        <div class="vehicle-image-box">
+                                            @if (vehicle.Vehicle.VehicleImgs != null && vehicle.Vehicle.VehicleImgs.Any())
                                             {
-                                                <div class="portal">
-                                                    <div class="packages-list">
-                                                        @foreach (var package in portal.Packages)
-                                                        {
-                                                            <div class="package-item">
-                                                                <h3 class="package-name">@package.Name</h3>
-                                                                <div class="package-selection">
-                                                                    <input type="radio" name="@portal.Name.ToLower()" value="@package.Id" />
-                                                                    <p style="color: red;">@package.Used.ToString("D3")</p>
-                                                                    <span>-</span>
-                                                                    <p style="color: green">@package.Available.ToString("D3")</p>
-                                                                </div>
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                </div>
+                                                var firstImage = vehicle.Vehicle.VehicleImgs.First();
+                                                <img src="@firstImage.ImageBase64" alt="@vehicle.Vehicle.Model" class="vehicle-image-item" />
                                             }
+                                            else
+                                            {
+                                                <img src="" alt="Sem imagem" class="vehicle-image-item" />
+                                            }
+                                        </div>
+                                        <div class="vehicle-content">
+                                            <div class="vehicle-info">
+                                                <h3 class="vehicle-model">@vehicle.Vehicle.Brand.ToUpper() @vehicle.Vehicle.Model.ToUpper() | @vehicle.Vehicle.Year</h3>
+                                                <p>Placa - <span style="color: green">@FormatLicensePlate(vehicle.Vehicle.LicensePlate)</span></p>
+                                                <p>Km - <span style="color: green">@(vehicle.Vehicle.Mileage.HasValue ? vehicle.Vehicle.Mileage.Value.ToString("N0") : "Não informado")</span></p>
+                                                <p>Cor - <span style="color: green">@vehicle.Vehicle.Color</span></p>
+                                            </div>
+                                            <div class="vehicle-actions-box">
+                                                <div class="vehicle-actions">
+                                                    <a asp-page="/Vehicle" asp-route-id="@vehicle.Vehicle.Id" class="btn-edit">
+                                                        <i class="fa-solid fa-pen-to-square" style="color: #ffffff"></i>
+                                                    </a>
+                                                    <p class="column">
+                                                        <i class="fa-solid fa-camera" style="color: grey"></i>
+                                                        <span style="color: green; font-size: 12px;">@(vehicle.Vehicle.VehicleImgs != null ? vehicle.Vehicle.VehicleImgs.Count().ToString("D2") : "00")</span>
+                                                    </p>
+                                                    <p class="column">
+                                                        <i class="fa-solid fa-car" style="color: grey;"></i>
+                                                        <span style="color: green; font-size: 12px;">@(vehicle.Vehicle.OptionalIds == null || !vehicle.Vehicle.OptionalIds.Any() ? "Sem opcionais" : "Opcionais")</span>
+                                                    </p>
+                                                </div>
+                                                <p class="vehicle-price" style="color: green">R$ @vehicle.Vehicle.Price.ToString("N2")</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="packages">
+                                        @{
+                                            var portals = new[]
+                                            {
+                                new { Packages = Model.ICarros, PortalType = PortalType.ICarros },
+                                new { Packages = Model.WebMotors, PortalType = PortalType.WebMotors }
+                                };
+                                        }
+                                        @if (portals.Any(p => p.Packages?.Any() == true))
+                                        {
+                                            <div class="portal-container">
+                                                <input type="hidden" name="VehiclePackagesForm[@vehicle.Index].VehicleId" value="@vehicle.Vehicle.Id" />
+                                                <div class="portal-actions">
+                                                    <i class="fa-solid fa-eraser fa-sm" style="color: red"></i>
+                                                    <i class="fa-solid fa-arrow-right fa-sm" style="color: green"></i>
+                                                </div>
+                                                @foreach (var portal in portals)
+                                                {
+                                                    if (portal.Packages?.Any() == true)
+                                                    {
+                                                        <div class="portal">
+                                                            <div class="packages-list">
+                                                                @foreach (var package in portal.Packages)
+                                                                {
+                                                                    var selectedPackage = vehicle.Vehicle.VehiclePackages
+                                                                    ?.FirstOrDefault(vp => vp.PortalType == portal.PortalType);
+
+                                                                    <div class="package-item">
+                                                                        <h3 class="package-name">@package.Name</h3>
+                                                                        <div class="package-selection">
+                                                                            <input type="checkbox"
+                                                                                   class="package-checkbox"
+                                                                                   data-portaltype="@portal.PortalType"
+                                                                                   data-vehicleid="@vehicle.Vehicle.Id"
+                                                                                   name="VehiclePackagesForm[@vehicle.Index].Packages[@portal.PortalType]"
+                                                                                   value="@package.Id"
+                                                                            @(package.IsExhausted ? "disabled" : "")
+                                                                            @(selectedPackage != null && selectedPackage.PackageId == package.Id ? "checked" : "") />
+                                                                            <p style="color: red;">@package.Used.ToString("D3")</p>
+                                                                            <span>-</span>
+                                                                            <p style="color: green">@package.Available.ToString("D3")</p>
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    <span class="pipe-style"></span>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <p>Nenhum pacote encontrado.</p>
                                         }
                                     </div>
-                                }
-                                else
-                                {
-                                    <p>Nenhum pacote encontrado.</p>
-                                }
-                            </div>
-                        </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p>Nenhum veículo cadastrado.</p>
+                        }
+                    </form>
+                </div>
+                <form id="deleteVehicleForm" method="post" asp-page-handler="DeleteVehicle" style="display: none;">
+                    <input type="hidden" id="deleteVehicleId" name="VehicleIdToDeletion" value="" />
+                </form>
+            </section>
+        </div>
+    </div>
+    <div class="pagination">
 
-                    }
-                }
-                else
-                {
-                    <p>Nenhum veículo cadastrado.</p>
-                }
-            </div>
-        </section>
+        @if (Model.CurrentGroup > 1)
+        {
+            <a href="?page=@(Math.Max(Model.PageNumber - Model.PageGroupSize, 1))" class="pagination-btn"><i class="fa-solid fa-angles-left"></i></a>
+        }
+
+        <a href="?page=@(Math.Max(Model.PageNumber - 1, 1))" class="pagination-btn" @(Model.PageNumber == 1 ? "disabled" : "")><i class="fa-solid fa-angle-left"></i></a>
+
+        <div class="pagination-number-box">
+            @for (int i = (Model.CurrentGroup - 1) * Model.PageGroupSize + 1; i <= Math.Min(Model.CurrentGroup * Model.PageGroupSize, Model.TotalPages); i++)
+            {
+                <a href="?page=@i" class="pagination-number @(Model.PageNumber == i ? "active" : "")">@i</a>
+            }
+        </div>
+        <a href="?page=@(Math.Min(Model.PageNumber + 1, Model.TotalPages))" class="pagination-btn" @(Model.PageNumber == Model.TotalPages ? "disabled" : "")><i class="fa-solid fa-angle-right"></i></a>
+
+        @if (Model.CurrentGroup < Model.TotalGroups)
+        {
+            <a href="?page=@(Math.Min(Model.PageNumber + Model.PageGroupSize, Model.TotalPages))" class="pagination-btn"><i class="fa-solid fa-angles-right"></i></a>
+        }
     </div>
 </div>
-
 <script>
     function validateYears() {
-        var anoMin = parseInt(document.getElementById('anoMin').value);
-        var anoMax = parseInt(document.getElementById('anoMax').value);
+        var anoMin = parseInt(document.getElementById('yearMin').value);
+        var anoMax = parseInt(document.getElementById('yearMax').value);
 
         if (anoMin > anoMax) {
             alert('Ano Min não pode ser maior que Ano Max.');
@@ -254,4 +319,38 @@
         }
         return true;
     }
+
+    function deleteVehicle(vehicleId) {
+        document.getElementById('deleteVehicleId').value = vehicleId;
+        document.getElementById('deleteVehicleForm').submit();
+
+        const params = new URLSearchParams();
+        params.append('VehicleIdToDeletion', vehicleId);
+
+        xhr.send(params.toString());
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkboxes = document.querySelectorAll('.package-checkbox');
+
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                if (this.checked) {
+                    var vehicleId = this.getAttribute('data-vehicleid');
+                    var portalType = this.getAttribute('data-portaltype');
+                    var checkboxesForPortalAndVehicle = document.querySelectorAll('.package-checkbox[data-vehicleid="' + vehicleId + '"][data-portaltype="' + portalType + '"]');
+
+                    checkboxesForPortalAndVehicle.forEach(function (otherCheckbox) {
+                        if (otherCheckbox !== checkbox) {
+                            otherCheckbox.checked = false;
+                        }
+                    });
+                }
+            });
+        });
+
+        document.getElementById('submitVehiclePackageButton').addEventListener('click', function () {
+            document.getElementById('VehiclePackageForm').submit();
+        });
+    });
 </script>
